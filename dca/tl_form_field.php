@@ -19,7 +19,7 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['isConditionalFormField'] = array
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['isConditionalFormField'],
 	'exclude'                 => true,
 	'inputType'               => 'checkbox',
-	'eval'                    => array('submitOnChange'=>true, 'tl_class'=>'clr m12')
+	'eval'                    => array('submitOnChange'=>true, 'tl_class'=>'clr')
 );
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['conditionalFormFieldCondition'] = array
 (
