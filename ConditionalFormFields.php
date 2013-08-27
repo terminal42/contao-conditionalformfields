@@ -36,6 +36,7 @@ class ConditionalFormFields extends Controller
                 if (!$objCondition($arrPost)) {
                     $objWidget->mandatory = false;
                     $objWidget->rgxp = '';
+                    $objWidget->disabled = true; // don't submit
                 }
             }
         }
