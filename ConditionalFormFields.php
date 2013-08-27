@@ -20,18 +20,23 @@ class ConditionalFormFields extends Controller
             $_SESSION['CONDITIONALFORMFIELDS'][$formId][$objWidget->name] = $objWidget->conditionalFormFieldCondition;
 
             // filter post data
-            $this->import('Input');
-            $arrPost = array();
-            foreach ($_POST as $k => $v) {
-                $arrPost[$k] = $this->Input->post($k);
-            }
+            if ($this->Input->post('FORM_SUBMIT') == $formId) {
+                $arrPost = array();
+                // can't read from $_POST because for whatever reason those are modified (wtf?) -.-
+                $arrFields = Database::getInstance()->prepare('SELECT name FROM tl_form_field WHERE pid=?' . ((!BE_USER_LOGGED_IN) ? ' AND invisible=\'\'' : '') . ' ORDER BY sorting')
+                    ->execute($arrForm['id'])
+                    ->fetchEach('name');
+                foreach ($arrFields as $strName) {
+                    $arrPost[$strName] = $this->Input->post($strName);
+                }
 
-            $strCondition = $this->generateCondition($objWidget->conditionalFormFieldCondition, 'php');
+                $strCondition = $this->generateCondition($objWidget->conditionalFormFieldCondition, 'php');
 
-            $objCondition = create_function('$arrPost', $strCondition);
-            if (!$objCondition($arrPost)) {
-                $objWidget->mandatory = false;
-                $objWidget->rgxp = '';
+                $objCondition = create_function('$arrPost', $strCondition);
+                if (!$objCondition($arrPost)) {
+                    $objWidget->mandatory = false;
+                    $objWidget->rgxp = '';
+                }
             }
         }
 
