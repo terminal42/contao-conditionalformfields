@@ -1,6 +1,10 @@
 var ConditionalFormFields = new Class({
     initialize: function(formId, triggers, fields, conditions) {
         this.form = document.id(document.body).getElement('input[name="FORM_SUBMIT"][value="' + formId + '"]').getParent('form');
+        if (!this.form) {
+            return;
+        }
+        this.form.setProperty('novalidate', 'novalidate');
         this.triggers = triggers;
         this.conditions = conditions;
         this.loadFields(fields);
