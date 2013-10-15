@@ -72,11 +72,13 @@ var ConditionalFormFields = new Class({
         // @todo: make this configurable/extendable for other widgets
         var ctrl = field.get('id');
         document.getElements('label[for="' + ctrl + '"], #' + ctrl + ', #' + ctrl + ' + br').removeClass('invisible');
+        field.getPrevious('p.error') && field.getPrevious('p.error').removeClass('invisible');
     },
 
     hideField: function(field) {
         // @todo: make this configurable/extendable for other widgets
         var ctrl = field.get('id');
         document.getElements('label[for="' + ctrl + '"], #' + ctrl + ', #' + ctrl + ' + br').addClass('invisible');
+        field.getPrevious('p.error') && field.getPrevious('p.error').addClass('invisible');
     }
 });
