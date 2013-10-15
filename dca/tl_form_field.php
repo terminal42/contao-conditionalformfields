@@ -45,5 +45,5 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['conditionalFormFieldCondition'] =
 	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['conditionalFormFieldCondition'],
 	'exclude'                 => true,
 	'inputType'               => 'textarea',
-	'eval'                    => array('tl_class'=>'clr', 'decodeEntities'=>true)
+	'eval'                    => array('tl_class'=>'clr', 'decodeEntities'=>true, 'style'=>'height:40px'),
 );
