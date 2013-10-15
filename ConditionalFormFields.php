@@ -33,7 +33,7 @@ class ConditionalFormFields extends Controller
         if ($objWidget->isConditionalFormField) {
 
             // JS magic
-            $GLOBALS['TL_JAVASCRIPT']['CONDITIONALFORMFIELDS'] = 'system/modules/conditionalformfields/assets/conditionalformfields.js';
+            $GLOBALS['TL_JAVASCRIPT']['CONDITIONALFORMFIELDS'] = 'system/modules/conditionalformfields/assets/conditionalformfields' . ($GLOBALS['TL_CONFIG']['debugMode'] ? '' : '.min') . '.js';
             $_SESSION['CONDITIONALFORMFIELDS'][$formId][$objWidget->name] = $objWidget->conditionalFormFieldCondition;
 
             // filter post data
