@@ -1,5 +1,6 @@
 var ConditionalFormFields = new Class({
     initialize: function(formId, triggers, fields, conditions) {
+        var self = this;
         this.form = document.id(document.body).getElement('input[name="FORM_SUBMIT"][value="' + formId + '"]').getParent('form');
         if (!this.form) {
             return;
@@ -7,20 +8,23 @@ var ConditionalFormFields = new Class({
         this.form.setProperty('novalidate', 'novalidate');
         this.triggers = triggers;
         this.conditions = conditions;
+
+        this.form.addEvent('ajax_change', function() { self.loadFields(fields); })
         this.loadFields(fields);
-        this.initOnChangeEvents();
-        this.updateFieldVisibility();
     },
 
     loadFields: function(fields) {
         var self = this;
-        this.fields = [];
+        this.fields = {};
         fields.forEach(function(field) {
             var el = self.form.getElement('*[name="' + field + '"]');
             if (el) {
                 self.fields[field] = el;
             }
         });
+
+        this.initOnChangeEvents();
+        this.updateFieldVisibility();
     },
 
     initOnChangeEvents: function() {
