@@ -15,4 +15,3 @@ CREATE TABLE `tl_form_field` (
   `isConditionalFormField` char(1) NOT NULL default '',
   `conditionalFormFieldCondition` varchar(255) NOT NULL default '',
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
