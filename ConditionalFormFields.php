@@ -91,9 +91,12 @@ class ConditionalFormFields extends Controller
      */
     private function generateJS($formId, $arrTriggerFields, $arrConditions, $arrAllFields)
     {
-        return '<script>
-new ConditionalFormFields(\'' . $formId . '\', ' . json_encode($arrTriggerFields) . ', ' . json_encode($arrAllFields) . ', ' . json_encode($arrConditions) . ');
-</script>';
+        return "
+<script>
+window.addEvent('domready', function() {
+    new ConditionalFormFields('" . $formId . "', " . json_encode($arrTriggerFields) . ", " . json_encode($arrAllFields) . ", " . json_encode($arrConditions) . ");
+});
+</script>";
     }
 
     private function generateConditions($arrFields)
