@@ -1,7 +1,8 @@
 var ConditionalFormFields = new Class({
     initialize: function(formId, triggers, fields, conditions) {
         var self = this;
-        this.form = document.id(document.body).getElement('input[name="FORM_SUBMIT"][value="' + formId + '"]').getParent('form');
+        var formSubmit = document.id(document.body).getElement('input[name="FORM_SUBMIT"][value="' + formId + '"]');
+        if (formSubmit) this.form = formSubmit.getParent('form');
         if (!this.form) {
             return;
         }
