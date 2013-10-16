@@ -34,7 +34,7 @@ class ConditionalFormFields extends Controller
 
             // JS magic
             $GLOBALS['TL_JAVASCRIPT']['CONDITIONALFORMFIELDS'] = 'system/modules/conditionalformfields/assets/conditionalformfields' . ($GLOBALS['TL_CONFIG']['debugMode'] ? '' : '.min') . '.js';
-            $_SESSION['CONDITIONALFORMFIELDS'][$formId][$objWidget->name] = $objWidget->conditionalFormFieldCondition;
+            $GLOBALS['CONDITIONALFORMFIELDS'][$formId][$objWidget->name] = $objWidget->conditionalFormFieldCondition;
 
             // filter post data
             if ($this->Input->post('FORM_SUBMIT') == $formId) {
@@ -70,7 +70,7 @@ class ConditionalFormFields extends Controller
      */
     public function outputFrontendTemplate($strBuffer, $strTemplate)
     {
-        if ($arrForms = $_SESSION['CONDITIONALFORMFIELDS']) {
+        if ($arrForms = $GLOBALS['CONDITIONALFORMFIELDS']) {
             foreach ($arrForms as $formId => $arrFields) {
                 $arrTriggerFields   = $this->generateTriggerFields($arrFields);
                 $arrConditions      = $this->generateConditions($arrFields);
