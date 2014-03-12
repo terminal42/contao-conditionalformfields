@@ -20,6 +20,23 @@
 
 class ConditionalFormFields extends Controller
 {
+
+    /**
+     * Add checkbox to tl_form_field palette
+     * @param   \DataContainer
+     */
+    public function addToPalette($dc)
+    {
+        foreach ($GLOBALS['TL_DCA']['tl_form_field']['palettes'] as $k => $palette) {
+            if ($k == '__selector__') {
+                continue;
+            }
+
+            $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k] = preg_replace('/({expert_legend(:hide)?})/u', '$1,isConditionalFormField', $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k]);
+        }
+
+    }
+
     /**
      * Apply conditional settings
      *
