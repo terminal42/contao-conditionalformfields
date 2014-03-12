@@ -74,6 +74,9 @@ var ConditionalFormFields = new Class({
         var ctrl = field.get('id');
         document.getElements('label[for="' + ctrl + '"], #' + ctrl + ', #' + ctrl + ' + br').removeClass('invisible');
         field.getPrevious('p.error') && field.getPrevious('p.error').removeClass('invisible');
+
+        // Support form_stylify
+        field.getParent('.select_container') && field.getParent('.select_container').removeClass('invisible');
     },
 
     hideField: function(field) {
@@ -81,5 +84,8 @@ var ConditionalFormFields = new Class({
         var ctrl = field.get('id');
         document.getElements('label[for="' + ctrl + '"], #' + ctrl + ', #' + ctrl + ' + br').addClass('invisible');
         field.getPrevious('p.error') && field.getPrevious('p.error').addClass('invisible');
+
+        // Support form_stylify
+        field.getParent('.select_container') && field.getParent('.select_container').addClass('invisible');
     }
 });
