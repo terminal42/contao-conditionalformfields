@@ -25,7 +25,7 @@ var ConditionalFormFields = new Class({
                     var name = el.get('name');
 
                     // Array
-                    if (name.substr(name.length - 2) == '[]') {
+                    if (name.substr(name.length - 2) == '[]' || el.get('type') == 'radio') {
                         if (!(self.fields[field] instanceof Array)) {
                             self.fields[field] = [];
                         }
@@ -54,7 +54,7 @@ var ConditionalFormFields = new Class({
         this.triggers.forEach(function(name) {
             var field = self.fields[name];
 
-            if (field instanceof Array) {
+            if (Array.isArray(field)) {
                 field.forEach(function(el) {
                     addChangeEvent(el);
                 });
@@ -70,10 +70,10 @@ var ConditionalFormFields = new Class({
         var values = this.loadValuesFromAllFields();
 
         Object.each(this.conditions, function(condition, field) {
-            condition = 'var in_array = function(needle, haystack) { return haystack.contains(needle); }; ' + condition;
+            condition = 'var in_array = function(needle, haystack) { return Array.isArray(haystack) ? haystack.contains(needle) : false; }; ' + condition;
             var fn = new Function('values', condition);
 
-            if (!fn(values)) {
+            if (!fn(values) && self.fields[field]) {
                 self.hideField(self.fields[field]);
             }
         });
@@ -83,7 +83,7 @@ var ConditionalFormFields = new Class({
         var res = [];
 
         Object.each(this.fields, function(field, key) {
-            if (field instanceof Array) {
+            if (Array.isArray(field)) {
                 res[key] = [];
 
                 field.forEach(function(el) {
@@ -101,6 +101,7 @@ var ConditionalFormFields = new Class({
 
     showAllFields: function() {
         var self = this;
+
         Object.each(this.fields, function(field) {
             self.showField(field);
         });
