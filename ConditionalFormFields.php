@@ -32,7 +32,18 @@ class ConditionalFormFields extends Controller
                 continue;
             }
 
-            $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k] = preg_replace('/({expert_legend(:hide)?})/u', '$1,isConditionalFormField', $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k]);
+            if (strpos('{expert_legend', $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k]) !== false) {
+                $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k] = preg_replace(
+                    '/({expert_legend(:hide)?})/u',
+                    '$1,isConditionalFormField',
+                    $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k]
+                );
+            } else {
+                $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k] = rtrim(
+                    $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k],
+                    ';'
+                ) . ';{expert_legend:hide},isConditionalFormField';
+            }
         }
 
     }
