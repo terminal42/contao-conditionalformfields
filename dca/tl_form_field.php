@@ -19,16 +19,14 @@
 
 
 /**
+ * Config
+ */
+$GLOBALS['TL_DCA']['tl_form_field']['config']['onload_callback'][] = array('ConditionalFormFields', 'addToPalette');
+
+
+/**
  * Palettes
  */
-foreach ($GLOBALS['TL_DCA']['tl_form_field']['palettes'] as $k => $palette) {
-    if ($k == '__selector__') {
-        continue;
-    }
-
-    $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k] = preg_replace('/({expert_legend(:hide)?})/u', '$1,isConditionalFormField', $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k]);
-}
-
 $GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'isConditionalFormField';
 $GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['isConditionalFormField'] = 'conditionalFormFieldCondition';
 

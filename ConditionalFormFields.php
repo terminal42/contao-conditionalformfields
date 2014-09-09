@@ -20,6 +20,34 @@
 
 class ConditionalFormFields extends Controller
 {
+
+    /**
+     * Add checkbox to tl_form_field palette
+     * @param   \DataContainer
+     */
+    public function addToPalette($dc)
+    {
+        foreach ($GLOBALS['TL_DCA']['tl_form_field']['palettes'] as $k => $palette) {
+            if ($k == '__selector__') {
+                continue;
+            }
+
+            if (strpos($GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k], '{expert_legend') !== false) {
+                $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k] = preg_replace(
+                    '/({expert_legend(:hide)?})/u',
+                    '$1,isConditionalFormField',
+                    $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k]
+                );
+            } else {
+                $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k] = rtrim(
+                    $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k],
+                    ';'
+                ) . ';{expert_legend:hide},isConditionalFormField';
+            }
+        }
+
+    }
+
     /**
      * Apply conditional settings
      *
@@ -114,6 +142,7 @@ window.addEvent('domready', function() {
         if ($strLanguage === 'js') {
             $strCondition = preg_replace("/\\$([A-Za-z0-9_]+)/u", "values.$1", $strCondition);
         } else {
+            $strCondition = str_replace('in_array', '@in_array', $strCondition);
             $strCondition = preg_replace("/\\$([A-Za-z0-9_]+)/u", '$arrPost[\'$1\']', $strCondition);
         }
 

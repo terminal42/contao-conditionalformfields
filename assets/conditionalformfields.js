@@ -18,9 +18,24 @@ var ConditionalFormFields = new Class({
         var self = this;
         this.fields = {};
         fields.forEach(function(field) {
-            var el = self.form.getElement('*[name="' + field + '"]');
-            if (el) {
-                self.fields[field] = el;
+            var els = self.form.getElements('*[name*="' + field + '"]');
+
+            if (els.length > 0) {
+                els.forEach(function(el) {
+                    var name = el.get('name');
+
+                    // Array
+                    if (name.substr(name.length - 2) == '[]' || el.get('type') == 'radio') {
+                        if (!(self.fields[field] instanceof Array)) {
+                            self.fields[field] = [];
+                        }
+
+                        self.fields[field].push(el);
+                    } else {
+                        // Regular field
+                        self.fields[field] = el;
+                    }
+                });
             }
         });
 
@@ -30,12 +45,22 @@ var ConditionalFormFields = new Class({
 
     initOnChangeEvents: function() {
         var self = this;
-        this.triggers.forEach(function(name) {
-            var field = self.fields[name];
-
+        var addChangeEvent = function(field) {
             field.addEvent('change', function() {
                 self.updateFieldVisibility()
             });
+        }
+
+        this.triggers.forEach(function(name) {
+            var field = self.fields[name];
+
+            if (Array.isArray(field)) {
+                field.forEach(function(el) {
+                    addChangeEvent(el);
+                });
+            } else {
+                addChangeEvent(field);
+            }
         });
     },
 
@@ -45,8 +70,10 @@ var ConditionalFormFields = new Class({
         var values = this.loadValuesFromAllFields();
 
         Object.each(this.conditions, function(condition, field) {
+            condition = 'var in_array = function(needle, haystack) { return Array.isArray(haystack) ? haystack.contains(needle) : false; }; ' + condition;
             var fn = new Function('values', condition);
-            if (!fn(values)) {
+
+            if (!fn(values) && self.fields[field]) {
                 self.hideField(self.fields[field]);
             }
         });
@@ -56,7 +83,17 @@ var ConditionalFormFields = new Class({
         var res = [];
 
         Object.each(this.fields, function(field, key) {
-            res[key] = field.get('value');
+            if (Array.isArray(field)) {
+                res[key] = [];
+
+                field.forEach(function(el) {
+                    if ((el.get('type') == 'checkbox' || el.get('type') == 'radio') && el.checked) {
+                        res[key].push(el.get('value'));
+                    }
+                });
+            } else {
+                res[key] = field.get('value');
+            }
         });
 
         return res;
@@ -64,22 +101,49 @@ var ConditionalFormFields = new Class({
 
     showAllFields: function() {
         var self = this;
+
         Object.each(this.fields, function(field) {
             self.showField(field);
         });
     },
 
     showField: function(field) {
-        // @todo: make this configurable/extendable for other widgets
-        var ctrl = field.get('id');
-        document.getElements('label[for="' + ctrl + '"], #' + ctrl + ', #' + ctrl + ' + br').removeClass('invisible');
-        field.getPrevious('p.error') && field.getPrevious('p.error').removeClass('invisible');
+        var show = function(field) {
+            // @todo: make this configurable/extendable for other widgets
+            var ctrl = field.get('id');
+            document.getElements('label[for="' + ctrl + '"], #' + ctrl + ', #' + ctrl + ' + br').removeClass('invisible');
+            field.getPrevious('p.error') && field.getPrevious('p.error').removeClass('invisible');
+
+            // Support form_stylify
+            field.getParent('.select_container') && field.getParent('.select_container').removeClass('invisible');
+        }
+
+        if (field instanceof Array) {
+            field.forEach(function(el) {
+                show(el);
+            });
+        } else {
+            show(field);
+        }
     },
 
     hideField: function(field) {
-        // @todo: make this configurable/extendable for other widgets
-        var ctrl = field.get('id');
-        document.getElements('label[for="' + ctrl + '"], #' + ctrl + ', #' + ctrl + ' + br').addClass('invisible');
-        field.getPrevious('p.error') && field.getPrevious('p.error').addClass('invisible');
+        var hide = function(field) {
+            // @todo: make this configurable/extendable for other widgets
+            var ctrl = field.get('id');
+            document.getElements('label[for="' + ctrl + '"], #' + ctrl + ', #' + ctrl + ' + br').addClass('invisible');
+            field.getPrevious('p.error') && field.getPrevious('p.error').addClass('invisible');
+
+            // Support form_stylify
+            field.getParent('.select_container') && field.getParent('.select_container').addClass('invisible');
+        }
+
+        if (field instanceof Array) {
+            field.forEach(function(el) {
+                hide(el);
+            });
+        } else {
+            hide(field);
+        }
     }
 });
