@@ -17,17 +17,11 @@
  * @license    http://opensource.org/licenses/lgpl-3.0.html
  */
 
-
-/**
- * Config
- */
-$GLOBALS['TL_DCA']['tl_form_field']['config']['onload_callback'][] = array('ConditionalFormFields', 'addToPalette');
-
-
 /**
  * Palettes
  */
 $GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'isConditionalFormField';
+$GLOBALS['TL_DCA']['tl_form_field']['palettes']['fieldsetfsStart'] = str_replace('label;', 'label,isConditionalFormField;', $GLOBALS['TL_DCA']['tl_form_field']['palettes']['fieldsetfsStart']);
 $GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['isConditionalFormField'] = 'conditionalFormFieldCondition';
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['isConditionalFormField'] = array

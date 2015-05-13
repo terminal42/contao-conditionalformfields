@@ -17,13 +17,13 @@
  * @license    http://opensource.org/licenses/lgpl-3.0.html
  */
 
-/**
- * Form fields
- */
-$GLOBALS['TL_FFL']['fieldset'] = 'FormFieldsetConditional';
 
-/**
- * Hooks
- */
-$GLOBALS['TL_HOOKS']['loadFormField'][] = array('ConditionalFormFields', 'loadFormField');
-$GLOBALS['TL_HOOKS']['outputFrontendTemplate'][] = array('ConditionalFormFields', 'outputFrontendTemplate');
+class FormFieldsetConditional extends \FormFieldset
+{
+
+    /**
+     * Template
+     * @var string
+     */
+    protected $strTemplate = 'form_fieldset_conditional';
+}

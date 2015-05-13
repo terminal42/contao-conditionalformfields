@@ -22,71 +22,127 @@ class ConditionalFormFields extends Controller
 {
 
     /**
-     * Add checkbox to tl_form_field palette
-     * @param   \DataContainer
-     */
-    public function addToPalette($dc)
-    {
-        foreach ($GLOBALS['TL_DCA']['tl_form_field']['palettes'] as $k => $palette) {
-            if ($k == '__selector__') {
-                continue;
-            }
-
-            if (strpos($GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k], '{expert_legend') !== false) {
-                $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k] = preg_replace(
-                    '/({expert_legend(:hide)?})/u',
-                    '$1,isConditionalFormField',
-                    $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k]
-                );
-            } else {
-                $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k] = rtrim(
-                    $GLOBALS['TL_DCA']['tl_form_field']['palettes'][$k],
-                    ';'
-                ) . ';{expert_legend:hide},isConditionalFormField';
-            }
-        }
-
-    }
-
-    /**
      * Apply conditional settings
      *
      * @param   Widget
      * @param   string
      * @param   array
+     * @param \Form $form
+     *
      * @return  Widget
      */
-    public function loadFormField($objWidget, $formId, $arrForm)
+    public function loadFormField($objWidget, $formId, $arrForm, \Form $form)
     {
-        if ($objWidget->isConditionalFormField) {
+        $fieldsets = $this->getConditionalFieldsets($arrForm['id'], $formId);
 
-            // JS magic
-            $GLOBALS['TL_JAVASCRIPT']['CONDITIONALFORMFIELDS'] = 'system/modules/conditionalformfields/assets/conditionalformfields' . ($GLOBALS['TL_CONFIG']['debugMode'] ? '' : '.min') . '.js';
-            $GLOBALS['CONDITIONALFORMFIELDS'][$formId][$objWidget->name] = $objWidget->conditionalFormFieldCondition;
+        if (empty($fieldsets)) {
+            return $objWidget;
+        }
 
-            // filter post data
-            if ($this->Input->post('FORM_SUBMIT') == $formId) {
-                $arrPost = array();
-                // can't read from $_POST because for whatever reason those are modified (wtf?) -.-
-                $arrFields = Database::getInstance()->prepare('SELECT name FROM tl_form_field WHERE pid=?' . ((!BE_USER_LOGGED_IN) ? ' AND invisible=\'\'' : '') . ' ORDER BY sorting')
-                    ->execute($arrForm['id'])
-                    ->fetchEach('name');
-                foreach ($arrFields as $strName) {
-                    $arrPost[$strName] = $this->Input->post($strName);
-                }
+        // Disable the HTML5 form validation
+        $form->novalidate = true;
 
-                $strCondition = $this->generateCondition($objWidget->conditionalFormFieldCondition, 'php');
+        // JS magic
+        $GLOBALS['TL_JAVASCRIPT']['CONDITIONALFORMFIELDS'] = 'system/modules/conditionalformfields/assets/conditionalformfields' . ($GLOBALS['TL_CONFIG']['debugMode'] ? '' : '.min') . '.js';
 
-                $objCondition = create_function('$arrPost', $strCondition);
-                if (!$objCondition($arrPost)) {
-                    $objWidget->mandatory = false;
-                    $objWidget->rgxp = '';
-                    $objWidget->disabled = true; // don't submit
+        // Find and mark the fields that should not be validated
+        if (\Input::post('FORM_SUBMIT') == $formId) {
+            $postData = $this->getFormPostData($arrForm['id']);
+
+            foreach ($fieldsets as $fieldset) {
+                foreach ($fieldset['fields'] as $fieldId) {
+                    if ($fieldId == $objWidget->id && !$fieldset['condition']($postData)) {
+                        $objWidget->mandatory = false;
+                        $objWidget->rgxp      = '';
+                        $objWidget->disabled  = true; // don't submit
+                    }
                 }
             }
         }
 
         return $objWidget;
+    }
+
+    /**
+     * Get the form postdata
+     *
+     * @param int $formId
+     *
+     * @return array
+     */
+    protected function getFormPostData($formId)
+    {
+        static $data;
+
+        if (!is_array($data)) {
+            $data = array();
+            $fieldModels = \FormFieldModel::findPublishedByPid($formId);
+
+            if ($fieldModels !== null) {
+                foreach ($fieldModels as $fieldModel) {
+                    $data[$fieldModel->name] = \Input::post($fieldModel->name);
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get the conditional fieldsets with condition and fields
+     *
+     * @param int    $formId
+     * @param string $formSubmitId
+     *
+     * @return array
+     */
+    protected function getConditionalFieldsets($formId, $formSubmitId)
+    {
+        static $fieldsets;
+
+        if (!is_array($fieldsets)) {
+            $fieldsets = array();
+            $fieldModels = \FormFieldModel::findPublishedByPid($formId);
+
+            if ($fieldModels !== null) {
+                $fieldset = null;
+
+                foreach ($fieldModels as $fieldModel) {
+
+                    // Start the fieldset
+                    if ($fieldModel->type == 'fieldset' && $fieldModel->fsType == 'fsStart' && $fieldModel->isConditionalFormField) {
+                        $fieldset = $fieldModel->id;
+                        $condition = $this->generateCondition($fieldModel->conditionalFormFieldCondition, 'php');
+
+                        $fieldsets[$fieldset] = array(
+                            'condition' => function ($arrPost) use ($condition) {
+                                return eval($condition);
+                            },
+                            'fields' => array(),
+                        );
+
+                        // JS
+                        $GLOBALS['CONDITIONALFORMFIELDS'][$formSubmitId][$fieldModel->id] = $fieldModel->conditionalFormFieldCondition;
+
+                        continue;
+                    }
+
+                    // Stop the fieldset
+                    if ($fieldModel->type == 'fieldset' && $fieldModel->fsType == 'fsStop') {
+                        $fieldset = null;
+                        continue;
+                    }
+
+                    if ($fieldset === null) {
+                        continue;
+                    }
+
+                    $fieldsets[$fieldset]['fields'][] = $fieldModel->id;
+                }
+            }
+        }
+
+        return $fieldsets;
     }
 
     /**
@@ -121,9 +177,12 @@ class ConditionalFormFields extends Controller
     {
         return "
 <script>
-window.addEvent('domready', function() {
-    new ConditionalFormFields('" . $formId . "', " . json_encode($arrTriggerFields) . ", " . json_encode($arrAllFields) . ", " . json_encode($arrConditions) . ");
-});
+(function($) {
+    $('input[name=\"FORM_SUBMIT\"][value=\"" . $formId . "\"]').parentsUntil('form').conditionalFormFields({
+        'fields': " . json_encode($arrTriggerFields) . ",
+        'conditions': " . json_encode($arrConditions) . "
+    });
+})(jQuery);
 </script>";
     }
 

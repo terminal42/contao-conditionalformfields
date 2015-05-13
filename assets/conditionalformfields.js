@@ -1,149 +1,142 @@
-var ConditionalFormFields = new Class({
-    initialize: function(formId, triggers, fields, conditions) {
-        var self = this;
-        var formSubmit = document.id(document.body).getElement('input[name="FORM_SUBMIT"][value="' + formId + '"]');
-        if (formSubmit) this.form = formSubmit.getParent('form');
-        if (!this.form) {
-            return;
-        }
-        this.form.setProperty('novalidate', 'novalidate');
-        this.triggers = triggers;
-        this.conditions = conditions;
+;(function ($, window, document, undefined) {
+    "use strict";
 
-        this.form.addEvent('ajax_change', function() { self.loadFields(fields); })
-        this.loadFields(fields);
-    },
+    // Create the defaults once
+    var pluginName = "conditionalFormFields";
+    var defaults = {
+        fields: [],
+        conditions: {}
+    };
 
-    loadFields: function(fields) {
-        var self = this;
-        this.fields = {};
-        fields.forEach(function(field) {
-            var els = self.form.getElements('*[name*="' + field + '"]');
+    // The actual plugin constructor
+    function ConditionalFormFields (element, options) {
+        this.element = element;
+        this.settings = $.extend({}, defaults, options);
+        this._defaults = defaults;
+        this._name = pluginName;
+        this.init();
+    }
 
-            if (els.length > 0) {
-                els.forEach(function(el) {
-                    var name = el.get('name');
+    // Avoid Plugin.prototype conflicts
+    $.extend(ConditionalFormFields.prototype, {
+        init: function() {
+            var $this = this;
+
+            $this.initFields();
+            $this.initFieldsets();
+
+            $(this.element).on('ajax_change', function() {
+                $this.initFields();
+                $this.initFieldsets();
+            });
+        },
+        initFields: function() {
+            var $this = this;
+
+            $this.fields = {};
+
+            $this.settings.fields.each(function(field) {
+                $($this.element).find('*[name^="' + field + '"]').each(function() {
+                    var field = $(this);
+                    var name = field.attr('name');
 
                     // Array
-                    if (name.substr(name.length - 2) == '[]' || el.get('type') == 'radio') {
-                        if (!(self.fields[field] instanceof Array)) {
-                            self.fields[field] = [];
+                    if (name.substr(name.length - 2) == '[]') {
+                        name = name.substr(0, name.length - 2);
+
+                        if (!($this.fields[name] instanceof Array)) {
+                            $this.fields[name] = [];
                         }
 
-                        self.fields[field].push(el);
+                        $this.fields[name].push(field);
                     } else {
                         // Regular field
-                        self.fields[field] = el;
+                        $this.fields[name] = field;
                     }
+
+                    $(this).on('change', function() {
+                        $this.toggleFieldsets();
+                    });
                 });
-            }
-        });
-
-        this.initOnChangeEvents();
-        this.updateFieldVisibility();
-    },
-
-    initOnChangeEvents: function() {
-        var self = this;
-        var addChangeEvent = function(field) {
-            field.addEvent('change', function() {
-                self.updateFieldVisibility()
             });
-        }
+        },
+        initFieldsets: function() {
+            var $this = this;
 
-        this.triggers.forEach(function(name) {
-            var field = self.fields[name];
+            $this.fieldsets = {};
 
-            if (Array.isArray(field)) {
-                field.forEach(function(el) {
-                    addChangeEvent(el);
-                });
-            } else {
-                addChangeEvent(field);
+            for (var id in $this.settings.conditions) {
+                $this.fieldsets[id] = $('[data-cffs="' + id + '"]');
             }
-        });
-    },
 
-    updateFieldVisibility: function() {
-        var self = this;
-        this.showAllFields();
-        var values = this.loadValuesFromAllFields();
+            $this.toggleFieldsets();
+        },
+        toggleFieldsets: function() {
+            var $this = this;
+            var values = $this.getFieldValues();
 
-        Object.each(this.conditions, function(condition, field) {
-            condition = 'var in_array = function(needle, haystack) { return Array.isArray(haystack) ? haystack.contains(needle) : false; }; ' + condition;
-            var fn = new Function('values', condition);
+            for (var id in $this.settings.conditions) {
+                var condition = 'var in_array = function(needle, haystack) { return jQuery.isArray(haystack) ? (jQuery.inArray(needle, haystack) != -1) : false; }; ' + $this.settings.conditions[id];
+                var fn = new Function('values', condition);
 
-            if (!fn(values) && self.fields[field]) {
-                self.hideField(self.fields[field]);
+                if (!fn(values)) {
+                    $this.hideFieldset(id);
+                } else {
+                    $this.showFieldset(id);
+                }
             }
-        });
-    },
+        },
+        showFieldset: function(id) {
+            this.fieldsets[id].show();
+        },
+        hideFieldset: function(id) {
+            this.fieldsets[id].hide();
+        },
+        getFieldValues: function() {
+            var $this = this;
+            var values = {};
+            var value = null;
 
-    loadValuesFromAllFields: function() {
-        var res = [];
+            $.each($this.fields, function(name) {
+                if ($.isArray(this)) {
+                    values[name] = [];
 
-        Object.each(this.fields, function(field, key) {
-            if (Array.isArray(field)) {
-                res[key] = [];
+                    $(this).each(function() {
+                        value = $this.getFieldValue(this);
 
-                field.forEach(function(el) {
-                    if ((el.get('type') == 'checkbox' || el.get('type') == 'radio') && el.checked) {
-                        res[key].push(el.get('value'));
+                        if (value) {
+                            values[name].push(value);
+                        }
+                    });
+                } else {
+                    value = $this.getFieldValue(this);
+
+                    if (value) {
+                        values[name] = value;
                     }
-                });
-            } else {
-                res[key] = field.get('value');
+                }
+            });
+
+            return values;
+        },
+        getFieldValue: function(el) {
+            el = $(el);
+
+            if (el.attr('type') == 'checkbox' || el.attr('type') == 'radio') {
+                return el.is(':checked') ? el.val() : null;
+            }
+
+            return el.val();
+        }
+    });
+
+    // A really lightweight plugin wrapper around the constructor,
+    // preventing against multiple instantiations
+    $.fn[pluginName] = function (options) {
+        return this.each(function() {
+            if (!$.data(this, 'plugin_' + pluginName)) {
+                $.data(this, 'plugin_' + pluginName, new ConditionalFormFields(this, options));
             }
         });
-
-        return res;
-    },
-
-    showAllFields: function() {
-        var self = this;
-
-        Object.each(this.fields, function(field) {
-            self.showField(field);
-        });
-    },
-
-    showField: function(field) {
-        var show = function(field) {
-            // @todo: make this configurable/extendable for other widgets
-            var ctrl = field.get('id');
-            document.getElements('label[for="' + ctrl + '"], #' + ctrl + ', #' + ctrl + ' + br').removeClass('invisible');
-            field.getPrevious('p.error') && field.getPrevious('p.error').removeClass('invisible');
-
-            // Support form_stylify
-            field.getParent('.select_container') && field.getParent('.select_container').removeClass('invisible');
-        }
-
-        if (field instanceof Array) {
-            field.forEach(function(el) {
-                show(el);
-            });
-        } else {
-            show(field);
-        }
-    },
-
-    hideField: function(field) {
-        var hide = function(field) {
-            // @todo: make this configurable/extendable for other widgets
-            var ctrl = field.get('id');
-            document.getElements('label[for="' + ctrl + '"], #' + ctrl + ', #' + ctrl + ' + br').addClass('invisible');
-            field.getPrevious('p.error') && field.getPrevious('p.error').addClass('invisible');
-
-            // Support form_stylify
-            field.getParent('.select_container') && field.getParent('.select_container').addClass('invisible');
-        }
-
-        if (field instanceof Array) {
-            field.forEach(function(el) {
-                hide(el);
-            });
-        } else {
-            hide(field);
-        }
-    }
-});
+    };
+})(jQuery, window, document);
