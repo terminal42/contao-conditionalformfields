@@ -44,9 +44,6 @@ class ConditionalFormFields extends Controller
             $objWidget->class = 'cffs-' . $objWidget->id;
         }
 
-        // Disable the HTML5 form validation
-        $form->novalidate = true;
-
         // JS magic
         $GLOBALS['TL_JAVASCRIPT']['CONDITIONALFORMFIELDS'] = 'system/modules/conditionalformfields/assets/conditionalformfields' . ($GLOBALS['TL_CONFIG']['debugMode'] ? '' : '.min') . '.js';
 

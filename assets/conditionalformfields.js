@@ -64,9 +64,11 @@
             var $this = this;
 
             $this.fieldsets = {};
+            $this.fieldsetFields = {};
 
             for (var id in $this.settings.conditions) {
                 $this.fieldsets[id] = $('.cffs-' + id);
+                $this.fieldsetFields[id] = $this.fieldsets[id].find('input, select, textarea');
             }
 
             $this.toggleFieldsets();
@@ -88,9 +90,17 @@
         },
         showFieldset: function(id) {
             this.fieldsets[id].show();
+
+            this.fieldsetFields[id].each(function() {
+                $(this).attr('disabled', false);
+            });
         },
         hideFieldset: function(id) {
             this.fieldsets[id].hide();
+
+            this.fieldsetFields[id].each(function() {
+                $(this).attr('disabled', true);
+            });
         },
         getFieldValues: function() {
             var $this = this;
