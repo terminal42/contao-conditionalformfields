@@ -18,11 +18,6 @@
  */
 
 /**
- * Form fields
- */
-$GLOBALS['TL_FFL']['fieldset'] = 'FormFieldsetConditional';
-
-/**
  * Hooks
  */
 $GLOBALS['TL_HOOKS']['loadFormField'][] = array('ConditionalFormFields', 'loadFormField');

@@ -16,13 +16,4 @@
 ClassLoader::addClasses(array
 (
     'ConditionalFormFields'   => 'system/modules/conditionalformfields/ConditionalFormFields.php',
-    'FormFieldsetConditional' => 'system/modules/conditionalformfields/FormFieldsetConditional.php',
-));
-
-/**
- * Register the templates
- */
-TemplateLoader::addFiles(array
-(
-    'form_fieldset_conditional' => 'system/modules/conditionalformfields/templates/forms',
 ));

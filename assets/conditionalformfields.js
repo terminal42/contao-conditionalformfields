@@ -66,7 +66,7 @@
             $this.fieldsets = {};
 
             for (var id in $this.settings.conditions) {
-                $this.fieldsets[id] = $('[data-cffs="' + id + '"]');
+                $this.fieldsets[id] = $('.cffs-' + id);
             }
 
             $this.toggleFieldsets();
