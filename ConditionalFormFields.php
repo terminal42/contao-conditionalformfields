@@ -39,7 +39,10 @@ class ConditionalFormFields extends Controller
             return $objWidget;
         }
 
-        $objWidget->class = 'cffs-' . $objWidget->id;
+        // Set the CSS class only for fieldsets
+        if ($objWidget->isConditionalFormField) {
+            $objWidget->class = 'cffs-' . $objWidget->id;
+        }
 
         // Disable the HTML5 form validation
         $form->novalidate = true;
