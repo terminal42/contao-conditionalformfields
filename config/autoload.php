@@ -15,5 +15,5 @@
  */
 ClassLoader::addClasses(array
 (
-    'ConditionalFormFields' => 'system/modules/conditionalformfields/ConditionalFormFields.php',
+    'ConditionalFormFields'   => 'system/modules/conditionalformfields/ConditionalFormFields.php',
 ));
