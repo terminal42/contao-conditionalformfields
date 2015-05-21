@@ -35,7 +35,7 @@
 
             $this.fields = {};
 
-            $this.settings.fields.each(function(field) {
+            $($this.settings.fields).each(function(i, field) {
                 $($this.element).find('*[name^="' + field + '"]').each(function() {
                     var field = $(this);
                     var name = field.attr('name');
@@ -95,14 +95,14 @@
         showFieldset: function(id) {
             this.fieldsets[id].show();
 
-            this.fieldsetFields[id].each(function() {
+            $(this.fieldsetFields[id]).each(function() {
                 $(this).attr('disabled', false);
             });
         },
         hideFieldset: function(id) {
             this.fieldsets[id].hide();
 
-            this.fieldsetFields[id].each(function() {
+            $(this.fieldsetFields[id]).each(function() {
                 $(this).attr('disabled', true);
             });
         },
