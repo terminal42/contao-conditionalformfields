@@ -35,14 +35,18 @@
 
             $this.fields = {};
 
-            $this.settings.fields.each(function(field) {
+            $($this.settings.fields).each(function(i, field) {
                 $($this.element).find('*[name^="' + field + '"]').each(function() {
                     var field = $(this);
                     var name = field.attr('name');
 
                     // Array
-                    if (name.substr(name.length - 2) == '[]') {
-                        name = name.substr(0, name.length - 2);
+                    if (name.substr(name.length - 2) == '[]' || field.attr('type') == 'radio') {
+
+                        // Remove the [] from name
+                        if (name.substr(name.length - 2) == '[]') {
+                            name = name.substr(0, name.length - 2);
+                        }
 
                         if (!($this.fields[name] instanceof Array)) {
                             $this.fields[name] = [];
@@ -91,14 +95,14 @@
         showFieldset: function(id) {
             this.fieldsets[id].show();
 
-            this.fieldsetFields[id].each(function() {
+            $(this.fieldsetFields[id]).each(function() {
                 $(this).attr('disabled', false);
             });
         },
         hideFieldset: function(id) {
             this.fieldsets[id].hide();
 
-            this.fieldsetFields[id].each(function() {
+            $(this.fieldsetFields[id]).each(function() {
                 $(this).attr('disabled', true);
             });
         },
