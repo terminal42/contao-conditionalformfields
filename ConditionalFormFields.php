@@ -102,8 +102,8 @@ class ConditionalFormFields extends Controller
     {
         static $fieldsets;
 
-        if (!is_array($fieldsets)) {
-            $fieldsets = array();
+        if (!is_array($fieldsets[$formId])) {
+            $fieldsets[$formId] = array();
             $fieldModels = \FormFieldModel::findPublishedByPid($formId);
 
             if ($fieldModels !== null) {
@@ -116,7 +116,7 @@ class ConditionalFormFields extends Controller
                         $fieldset = $fieldModel->id;
                         $condition = $this->generateCondition($fieldModel->conditionalFormFieldCondition, 'php');
 
-                        $fieldsets[$fieldset] = array(
+                        $fieldsets[$formId][$fieldset] = array(
                             'condition' => function ($arrPost) use ($condition) {
                                 return eval($condition);
                             },
@@ -139,12 +139,12 @@ class ConditionalFormFields extends Controller
                         continue;
                     }
 
-                    $fieldsets[$fieldset]['fields'][] = $fieldModel->id;
+                    $fieldsets[$formId][$fieldset]['fields'][] = $fieldModel->id;
                 }
             }
         }
 
-        return $fieldsets;
+        return $fieldsets[$formId];
     }
 
     /**
