@@ -20,6 +20,67 @@
 
 class ConditionalFormFields extends Controller
 {
+    protected static $fieldsets;
+
+    /**
+     * Register hook when initializeSystem hook is triggerd.
+     */
+    public function registerHook()
+    {
+        $GLOBALS['TL_HOOKS']['compileFormFields'][] = array(__CLASS__, 'registerFieldsets');
+    }
+
+    /**
+     * Register fieldsets.
+     *
+     * @param $fieldModels
+     * @param $formSubmitId
+     * @param $objForm
+     *
+     * @return mixed
+     */
+    public function registerFieldsets($fieldModels, $formSubmitId, $objForm)
+    {
+        $formId = $objForm->id;
+        $fieldset = null;
+
+        static::$fieldsets[$formId] = array();
+
+        foreach ($fieldModels as $fieldModel) {
+
+            // Start the fieldset
+            if ($fieldModel->type == 'fieldset' && $fieldModel->fsType == 'fsStart' && $fieldModel->isConditionalFormField) {
+                $fieldset = $fieldModel->id;
+                $condition = $this->generateCondition($fieldModel->conditionalFormFieldCondition, 'php');
+
+                static::$fieldsets[$formId][$fieldset] = array(
+                    'condition' => function ($arrPost) use ($condition) {
+                        return eval($condition);
+                    },
+                    'fields' => array(),
+                );
+
+                // JS
+                $GLOBALS['CONDITIONALFORMFIELDS'][$formSubmitId][$fieldModel->id] = $fieldModel->conditionalFormFieldCondition;
+
+                continue;
+            }
+
+            // Stop the fieldset
+            if ($fieldModel->type == 'fieldset' && $fieldModel->fsType == 'fsStop') {
+                $fieldset = null;
+                continue;
+            }
+
+            if ($fieldset === null) {
+                continue;
+            }
+
+            static::$fieldsets[$formId][$fieldset]['fields'][] = $fieldModel->id;
+        }
+
+        return $fieldModels;
+    }
 
     /**
      * Apply conditional settings
@@ -33,9 +94,7 @@ class ConditionalFormFields extends Controller
      */
     public function loadFormField($objWidget, $formId, $arrForm, \Form $form)
     {
-        $fieldsets = $this->getConditionalFieldsets($arrForm['id'], $formId);
-
-        if (empty($fieldsets)) {
+        if (empty(static::$fieldsets[$form->id])) {
             return $objWidget;
         }
 
@@ -51,7 +110,7 @@ class ConditionalFormFields extends Controller
         if (\Input::post('FORM_SUBMIT') == $formId) {
             $postData = $this->getFormPostData($arrForm['id']);
 
-            foreach ($fieldsets as $fieldset) {
+            foreach (static::$fieldsets[$form->id] as $fieldset) {
                 foreach ($fieldset['fields'] as $fieldId) {
                     if ($fieldId == $objWidget->id && !$fieldset['condition']($postData)) {
                         $objWidget->mandatory = false;
@@ -88,63 +147,6 @@ class ConditionalFormFields extends Controller
         }
 
         return $data;
-    }
-
-    /**
-     * Get the conditional fieldsets with condition and fields
-     *
-     * @param int    $formId
-     * @param string $formSubmitId
-     *
-     * @return array
-     */
-    protected function getConditionalFieldsets($formId, $formSubmitId)
-    {
-        static $fieldsets;
-
-        if (!is_array($fieldsets[$formId])) {
-            $fieldsets[$formId] = array();
-            $fieldModels = \FormFieldModel::findPublishedByPid($formId);
-
-            if ($fieldModels !== null) {
-                $fieldset = null;
-
-                foreach ($fieldModels as $fieldModel) {
-
-                    // Start the fieldset
-                    if ($fieldModel->type == 'fieldset' && $fieldModel->fsType == 'fsStart' && $fieldModel->isConditionalFormField) {
-                        $fieldset = $fieldModel->id;
-                        $condition = $this->generateCondition($fieldModel->conditionalFormFieldCondition, 'php');
-
-                        $fieldsets[$formId][$fieldset] = array(
-                            'condition' => function ($arrPost) use ($condition) {
-                                return eval($condition);
-                            },
-                            'fields' => array(),
-                        );
-
-                        // JS
-                        $GLOBALS['CONDITIONALFORMFIELDS'][$formSubmitId][$fieldModel->id] = $fieldModel->conditionalFormFieldCondition;
-
-                        continue;
-                    }
-
-                    // Stop the fieldset
-                    if ($fieldModel->type == 'fieldset' && $fieldModel->fsType == 'fsStop') {
-                        $fieldset = null;
-                        continue;
-                    }
-
-                    if ($fieldset === null) {
-                        continue;
-                    }
-
-                    $fieldsets[$formId][$fieldset]['fields'][] = $fieldModel->id;
-                }
-            }
-        }
-
-        return $fieldsets[$formId];
     }
 
     /**
