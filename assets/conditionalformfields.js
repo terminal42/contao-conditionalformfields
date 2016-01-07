@@ -41,12 +41,8 @@
                     var name = field.attr('name');
 
                     // Array
-                    if (name.substr(name.length - 2) == '[]' || field.attr('type') == 'radio') {
-
-                        // Remove the [] from name
-                        if (name.substr(name.length - 2) == '[]') {
-                            name = name.substr(0, name.length - 2);
-                        }
+                    if (name.substr(name.length - 2) == '[]') {
+                        name = name.substr(0, name.length - 2);
 
                         if (!($this.fields[name] instanceof Array)) {
                             $this.fields[name] = [];
