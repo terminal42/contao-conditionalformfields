@@ -108,7 +108,7 @@
             var value = null;
 
             $.each($this.fields, function(name) {
-                if ($.isArray(this)) {
+                if ($.isArray(this) && el.attr('type') != 'radio') {
                     values[name] = [];
 
                     $(this).each(function() {
