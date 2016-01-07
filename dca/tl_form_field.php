@@ -26,16 +26,18 @@ $GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['isConditionalFormField'] = '
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['isConditionalFormField'] = array
 (
-	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['isConditionalFormField'],
-	'exclude'                 => true,
-	'inputType'               => 'checkbox',
-	'eval'                    => array('submitOnChange'=>true, 'tl_class'=>'clr')
+    'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['isConditionalFormField'],
+    'exclude'                 => true,
+    'inputType'               => 'checkbox',
+    'eval'                    => array('submitOnChange'=>true, 'tl_class'=>'clr'),
+    'sql'                     => "char(1) NOT NULL default ''",
 );
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['conditionalFormFieldCondition'] = array
 (
-	'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['conditionalFormFieldCondition'],
-	'exclude'                 => true,
-	'inputType'               => 'textarea',
-	'eval'                    => array('tl_class'=>'clr', 'decodeEntities'=>true, 'style'=>'height:40px'),
+    'label'                   => &$GLOBALS['TL_LANG']['tl_form_field']['conditionalFormFieldCondition'],
+    'exclude'                 => true,
+    'inputType'               => 'textarea',
+    'eval'                    => array('tl_class'=>'clr', 'decodeEntities'=>true, 'style'=>'height:40px'),
+    'sql'                     => "varchar(255) NOT NULL default ''",
 );

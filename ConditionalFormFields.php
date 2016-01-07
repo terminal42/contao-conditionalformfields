@@ -22,6 +22,8 @@ class ConditionalFormFields extends Controller
 {
     protected static $fieldsets;
 
+    protected static $reset;
+
     /**
      * Register hook when initializeSystem hook is triggerd.
      */
@@ -45,6 +47,7 @@ class ConditionalFormFields extends Controller
         $fieldset = null;
 
         static::$fieldsets[$formId] = array();
+        static::$reset[$formId] = array();
 
         foreach ($fieldModels as $fieldModel) {
 
@@ -85,10 +88,10 @@ class ConditionalFormFields extends Controller
     /**
      * Apply conditional settings
      *
-     * @param   Widget
-     * @param   string
-     * @param   array
-     * @param \Form $form
+     * @param Widget $objWidget
+     * @param string $formId
+     * @param array  $arrForm
+     * @param \Form  $form
      *
      * @return  Widget
      */
@@ -113,12 +116,33 @@ class ConditionalFormFields extends Controller
             foreach (static::$fieldsets[$form->id] as $fieldset) {
                 foreach ($fieldset['fields'] as $fieldId) {
                     if ($fieldId == $objWidget->id && !$fieldset['condition']($postData)) {
+                        static::$reset[$formId][$objWidget->id]['mandatory'] = $objWidget->mandatory;
+                        static::$reset[$formId][$objWidget->id]['rgxp'] = $objWidget->rgxp;
+
                         $objWidget->mandatory = false;
                         $objWidget->rgxp      = '';
                         $objWidget->disabled  = true; // don't submit
                     }
                 }
             }
+        }
+
+        return $objWidget;
+    }
+
+    /**
+     * Reset conditional settings
+     *
+     * @param Widget $objWidget
+     * @param string $formId
+     *
+     * @return Widget
+     */
+    public function validateFormField($objWidget, $formId)
+    {
+        if (isset(static::$reset[$formId][$objWidget->id])) {
+            $objWidget->mandatory = static::$reset[$formId][$objWidget->id]['mandatory'];
+            $objWidget->rgxp = static::$reset[$formId][$objWidget->id]['rgpx'];
         }
 
         return $objWidget;
