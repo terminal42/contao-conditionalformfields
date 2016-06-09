@@ -49,6 +49,13 @@
                         }
 
                         $this.fields[name].push(field);
+                    } else if (field.attr('type') === 'radio') {
+                        // Radio
+                        if (!($this.fields[name] instanceof Array)) {
+                            $this.fields[name] = [];
+                        }
+
+                        $this.fields[name].push(field);
                     } else {
                         // Regular field
                         $this.fields[name] = field;
@@ -108,22 +115,24 @@
             var value = null;
 
             $.each($this.fields, function(name) {
-                if ($(this).attr('type') == 'radio') {
+                if ($.isArray(this)) {
                     $(this).each(function() {
-                        value = $this.getFieldValue(this);
+                        // Radio
+                        if ($(this).attr('type') === 'radio') {
+                            value = $this.getFieldValue(this);
 
-                        if (value) {
-                            values[name] = value;
-                        }
-                    });
-                } else if ($.isArray(this)) {
-                    values[name] = [];
+                            if (value) {
+                                values[name] = value;
+                                return false; // break the loop
+                            }
+                        } else {
+                            // Others
+                            values[name] = [];
+                            value = $this.getFieldValue(this);
 
-                    $(this).each(function() {
-                        value = $this.getFieldValue(this);
-
-                        if (value) {
-                            values[name].push(value);
+                            if (value) {
+                                values[name].push(value);
+                            }
                         }
                     });
                 } else {
