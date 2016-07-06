@@ -23,4 +23,4 @@
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = array('ConditionalFormFields', 'registerHook');
 $GLOBALS['TL_HOOKS']['loadFormField'][] = array('ConditionalFormFields', 'loadFormField');
 $GLOBALS['TL_HOOKS']['validateFormField'][] = array('ConditionalFormFields', 'validateFormField');
-$GLOBALS['TL_HOOKS']['outputFrontendTemplate'][] = array('ConditionalFormFields', 'outputFrontendTemplate');
+$GLOBALS['TL_HOOKS']['modifyFrontendPage'][] = array('ConditionalFormFields', 'outputFrontendTemplate');
