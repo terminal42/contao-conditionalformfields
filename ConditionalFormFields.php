@@ -57,7 +57,7 @@ class ConditionalFormFields extends Controller
                 $condition = $this->generateCondition($fieldModel->conditionalFormFieldCondition, 'php');
 
                 static::$fieldsets[$formId][$fieldset] = array(
-                    'condition' => function ($arrPost) use ($condition) {
+                    'condition' => function () use ($condition) {
                         return eval($condition);
                     },
                     'fields' => array(),
@@ -98,6 +98,7 @@ class ConditionalFormFields extends Controller
     public function loadFormField($objWidget, $formId, $arrForm, \Form $form)
     {
         if (empty(static::$fieldsets[$form->id])) {
+
             return $objWidget;
         }
 
