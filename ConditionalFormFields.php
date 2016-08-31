@@ -22,8 +22,6 @@ class ConditionalFormFields extends Controller
 {
     protected static $fieldsets;
 
-    protected static $reset;
-
     /**
      * Register hook when initializeSystem hook is triggerd.
      */
@@ -47,7 +45,6 @@ class ConditionalFormFields extends Controller
         $fieldset = null;
 
         static::$fieldsets[$formId] = array();
-        static::$reset[$formId] = array();
 
         foreach ($fieldModels as $fieldModel) {
 
@@ -57,7 +54,7 @@ class ConditionalFormFields extends Controller
                 $condition = $this->generateCondition($fieldModel->conditionalFormFieldCondition, 'php');
 
                 static::$fieldsets[$formId][$fieldset] = array(
-                    'condition' => function ($arrPost) use ($condition) {
+                    'condition' => function () use ($condition) {
                         return eval($condition);
                     },
                     'fields' => array(),
@@ -98,6 +95,7 @@ class ConditionalFormFields extends Controller
     public function loadFormField($objWidget, $formId, $arrForm, \Form $form)
     {
         if (empty(static::$fieldsets[$form->id])) {
+
             return $objWidget;
         }
 
@@ -109,40 +107,44 @@ class ConditionalFormFields extends Controller
         // JS magic
         $GLOBALS['TL_JAVASCRIPT']['CONDITIONALFORMFIELDS'] = 'system/modules/conditionalformfields/assets/conditionalformfields' . ($GLOBALS['TL_CONFIG']['debugMode'] ? '' : '.min') . '.js';
 
-        // Find and mark the fields that should not be validated
-        if (\Input::post('FORM_SUBMIT') == $formId) {
-            $postData = $this->getFormPostData($arrForm['id']);
-
-            foreach (static::$fieldsets[$form->id] as $fieldset) {
-                foreach ($fieldset['fields'] as $fieldId) {
-                    if ($fieldId == $objWidget->id && !$fieldset['condition']($postData)) {
-                        static::$reset[$formId][$objWidget->id]['mandatory'] = $objWidget->mandatory;
-                        static::$reset[$formId][$objWidget->id]['rgxp'] = $objWidget->rgxp;
-
-                        $objWidget->mandatory = false;
-                        $objWidget->rgxp      = '';
-                        $objWidget->disabled  = true; // don't submit
-                    }
-                }
-            }
-        }
-
         return $objWidget;
     }
 
     /**
-     * Reset conditional settings
+     * Validate only if needed.
      *
      * @param Widget $objWidget
      * @param string $formId
+     * @param array  $arrForm
+     * @param \Form  $form
      *
      * @return Widget
      */
-    public function validateFormField($objWidget, $formId)
+    public function validateFormField($objWidget, $formId, $arrForm, \Form $form)
     {
-        if (isset(static::$reset[$formId][$objWidget->id])) {
-            $objWidget->mandatory = static::$reset[$formId][$objWidget->id]['mandatory'];
-            $objWidget->rgxp = static::$reset[$formId][$objWidget->id]['rgpx'];
+        // At this stage, widgets are already validated by the Form class
+        // The mandatory (or any other restriction such as rgxp) settings are thus
+        // already checked for fields that are conditional. We thus reset the
+        // errors to none on them (ugly with reflection but there's no setter
+        // on the Widget class so...)
+
+        if (empty(static::$fieldsets[$form->id])) {
+
+            return $objWidget;
+        }
+
+        $postData = $this->getFormPostData($arrForm['id']);
+
+        foreach (static::$fieldsets[$form->id] as $fieldset) {
+            foreach ($fieldset['fields'] as $fieldId) {
+                if ($fieldId == $objWidget->id && !$fieldset['condition']($postData)) {
+
+                    $reflection = new ReflectionClass($objWidget);
+                    $errors = $reflection->getProperty('arrErrors');
+                    $errors->setAccessible(true);
+                    $errors->setValue($objWidget, []);
+                }
+            }
         }
 
         return $objWidget;
