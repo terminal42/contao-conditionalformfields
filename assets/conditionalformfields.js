@@ -127,7 +127,10 @@
                             }
                         } else {
                             // Others
-                            values[name] = [];
+                            if (undefined === values[name]) {
+                                values[name] = [];
+                            }
+
                             value = $this.getFieldValue(this);
 
                             if (value) {
