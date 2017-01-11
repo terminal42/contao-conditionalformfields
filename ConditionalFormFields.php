@@ -54,7 +54,7 @@ class ConditionalFormFields extends Controller
                 $condition = $this->generateCondition($fieldModel->conditionalFormFieldCondition, 'php');
 
                 static::$fieldsets[$formId][$fieldset] = array(
-                    'condition' => function () use ($condition) {
+                    'condition' => function ($arrPost) use ($condition) {
                         return eval($condition);
                     },
                     'fields' => array(),
