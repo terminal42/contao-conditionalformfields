@@ -143,6 +143,9 @@ class ConditionalFormFields extends Controller
                     $errors = $reflection->getProperty('arrErrors');
                     $errors->setAccessible(true);
                     $errors->setValue($objWidget, []);
+                    
+                    // Widget needs to be set to disabled (#17)
+                    $objWidget->disabled = true;
                 }
             }
         }
