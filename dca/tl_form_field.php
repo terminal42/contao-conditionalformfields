@@ -39,5 +39,5 @@ $GLOBALS['TL_DCA']['tl_form_field']['fields']['conditionalFormFieldCondition'] =
     'exclude'                 => true,
     'inputType'               => 'textarea',
     'eval'                    => array('mandatory'=>true, 'decodeEntities'=>true, 'style'=>'height:40px', 'tl_class'=>'clr'),
-    'sql'                     => "varchar(255) NOT NULL default ''",
+    'sql'                     => "text NULL",
 );
