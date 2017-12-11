@@ -211,7 +211,7 @@ class ConditionalFormFields extends Controller
         return "
 <script>
 (function($) {
-    $('input[name=\"FORM_SUBMIT\"][value=\"" . $formId . "\"]').parentsUntil('form').conditionalFormFields({
+    $('input[name=\"FORM_SUBMIT\"][value=\"" . $formId . "\"]').parents('form').conditionalFormFields({
         'fields': " . json_encode($arrTriggerFields) . ",
         'conditions': " . json_encode($arrConditions) . "
     });
