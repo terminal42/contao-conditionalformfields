@@ -22,6 +22,7 @@
  */
 $GLOBALS['TL_DCA']['tl_form_field']['palettes']['__selector__'][] = 'isConditionalFormField';
 $GLOBALS['TL_DCA']['tl_form_field']['palettes']['fieldsetfsStart'] = str_replace('label;', 'label,isConditionalFormField;', $GLOBALS['TL_DCA']['tl_form_field']['palettes']['fieldsetfsStart']);
+$GLOBALS['TL_DCA']['tl_form_field']['palettes']['fieldsetStart'] = str_replace('label;', 'label,isConditionalFormField;', $GLOBALS['TL_DCA']['tl_form_field']['palettes']['fieldsetStart']);
 $GLOBALS['TL_DCA']['tl_form_field']['subpalettes']['isConditionalFormField'] = 'conditionalFormFieldCondition';
 
 $GLOBALS['TL_DCA']['tl_form_field']['fields']['isConditionalFormField'] = array
