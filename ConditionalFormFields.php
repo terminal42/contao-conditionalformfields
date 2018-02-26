@@ -49,7 +49,7 @@ class ConditionalFormFields extends Controller
         foreach ($fieldModels as $fieldModel) {
 
             // Start the fieldset
-            if ($fieldModel->type == 'fieldset' && $fieldModel->fsType == 'fsStart' && $fieldModel->isConditionalFormField) {
+            if ((($fieldModel->type == 'fieldset' && $fieldModel->fsType == 'fsStart') || $fieldModel->type == 'fieldsetStart') && $fieldModel->isConditionalFormField) {
                 $fieldset = $fieldModel->id;
                 $condition = $this->generateCondition($fieldModel->conditionalFormFieldCondition, 'php');
 
@@ -67,7 +67,7 @@ class ConditionalFormFields extends Controller
             }
 
             // Stop the fieldset
-            if ($fieldModel->type == 'fieldset' && $fieldModel->fsType == 'fsStop') {
+            if ($fieldModel->type == 'fieldset' && $fieldModel->fsType == 'fsStop' || $fieldModel->type == 'fieldsetStop') {
                 $fieldset = null;
                 continue;
             }
