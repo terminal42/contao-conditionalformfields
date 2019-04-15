@@ -88,11 +88,11 @@ class ConditionalFormFields extends Controller
      * @param Widget $objWidget
      * @param string $formId
      * @param array  $arrForm
-     * @param \Form  $form
+     * @param \Contao\Form  $form
      *
      * @return  Widget
      */
-    public function loadFormField($objWidget, $formId, $arrForm, \Form $form)
+    public function loadFormField($objWidget, $formId, $arrForm, \Contao\Form $form)
     {
         if (empty(static::$fieldsets[$form->id])) {
 
@@ -116,11 +116,11 @@ class ConditionalFormFields extends Controller
      * @param Widget $objWidget
      * @param string $formId
      * @param array  $arrForm
-     * @param \Form  $form
+     * @param \Contao\Form  $form
      *
      * @return Widget
      */
-    public function validateFormField($objWidget, $formId, $arrForm, \Form $form)
+    public function validateFormField($objWidget, $formId, $arrForm, \Contao\Form $form)
     {
         // At this stage, widgets are already validated by the Form class
         // The mandatory (or any other restriction such as rgxp) settings are thus
