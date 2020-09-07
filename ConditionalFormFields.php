@@ -252,6 +252,7 @@ class ConditionalFormFields extends Controller
             }
         }
 
-        return $arrTriggerFields;
+        // The array must not be associative, see #32
+        return array_values($arrTriggerFields);
     }
 }
