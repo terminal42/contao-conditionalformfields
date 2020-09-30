@@ -223,6 +223,11 @@ class ConditionalFormFields extends Controller
 
     private function generateJS($formId, $formSubmitId, $arrTriggerFields, $arrConditions, $arrAllFields)
     {
+        // No need to generate any JS if the form does not have any conditions
+        if (!$arrTriggerFields) {
+            return '';
+        }
+
         $previousStepsData = array();
 
         // Compatibility with mp_forms
@@ -230,11 +235,6 @@ class ConditionalFormFields extends Controller
             $manager = new \MPFormsFormManager($formId);
             $previousStepsData = $manager->getDataOfAllSteps();
             $previousStepsData = $previousStepsData['submitted'];
-        }
-
-        // No need to generate any JS if the form does not have any conditions
-        if (!$arrTriggerFields) {
-            return '';
         }
 
         return "
