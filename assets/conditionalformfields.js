@@ -5,7 +5,8 @@
     var pluginName = "conditionalFormFields";
     var defaults = {
         fields: [],
-        conditions: {}
+        conditions: {},
+        previousValues: {}
     };
 
     // The actual plugin constructor
@@ -111,7 +112,7 @@
         },
         getFieldValues: function() {
             var $this = this;
-            var values = {};
+            var values = $this.settings.previousValues;
             var value = null;
 
             $.each($this.fields, function(name) {
