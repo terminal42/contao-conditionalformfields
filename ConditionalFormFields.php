@@ -46,8 +46,13 @@ class ConditionalFormFields extends Controller
 
         static::$fieldsets[$formId] = array();
 
-        foreach ($fieldModels as $fieldModel) {
+        // JS
+        $GLOBALS['CONDITIONALFORMFIELDS'][$formId] = array(
+            'formSubmitId' => $formSubmitId,
+            'fields' => array()
+        );
 
+        foreach ($fieldModels as $fieldModel) {
             // Start the fieldset
             if ((($fieldModel->type == 'fieldset' && $fieldModel->fsType == 'fsStart') || $fieldModel->type == 'fieldsetStart') && $fieldModel->isConditionalFormField) {
                 $fieldset = $fieldModel->id;
@@ -61,7 +66,7 @@ class ConditionalFormFields extends Controller
                 );
 
                 // JS
-                $GLOBALS['CONDITIONALFORMFIELDS'][$formSubmitId][$fieldModel->id] = $fieldModel->conditionalFormFieldCondition;
+                $GLOBALS['CONDITIONALFORMFIELDS'][$formId]['fields'][$fieldModel->id] = $fieldModel->conditionalFormFieldCondition;
 
                 continue;
             }
@@ -142,8 +147,8 @@ class ConditionalFormFields extends Controller
                     $reflection = new ReflectionClass($objWidget);
                     $errors = $reflection->getProperty('arrErrors');
                     $errors->setAccessible(true);
-                    $errors->setValue($objWidget, []);
-                    
+                    $errors->setValue($objWidget, array());
+
                     // Widget needs to be set to disabled (#17)
                     $objWidget->disabled = true;
                 }
@@ -163,14 +168,30 @@ class ConditionalFormFields extends Controller
     protected function getFormPostData($formId)
     {
         static $data;
+        $previousStepsData = array();
 
         if (!is_array($data)) {
             $data = array();
             $fieldModels = \FormFieldModel::findPublishedByPid($formId);
 
             if ($fieldModels !== null) {
+                // Compatibility with mp_forms
+                if (class_exists('MPFormsFormManager')) {
+                    $manager = new \MPFormsFormManager($formId);
+                    $previousStepsData = $manager->getDataOfAllSteps();
+                    $previousStepsData = $previousStepsData['submitted'];
+                }
+
                 foreach ($fieldModels as $fieldModel) {
-                    $data[$fieldModel->name] = \Input::post($fieldModel->name);
+                    // Load post value with priority if available
+                    if ($_POST[$fieldModel->name]) {
+                        $data[$fieldModel->name] = \Input::post($fieldModel->name);
+                        continue;
+                    }
+
+                    if (isset($previousStepsData[$fieldModel->name])) {
+                        $data[$fieldModel->name] = $previousStepsData[$fieldModel->name];
+                    }
                 }
             }
         }
@@ -188,32 +209,41 @@ class ConditionalFormFields extends Controller
     public function outputFrontendTemplate($strBuffer, $strTemplate)
     {
         if ($arrForms = $GLOBALS['CONDITIONALFORMFIELDS']) {
-            foreach ($arrForms as $formId => $arrFields) {
-                $arrTriggerFields   = $this->generateTriggerFields($arrFields);
-                $arrConditions      = $this->generateConditions($arrFields);
+            foreach ($arrForms as $formId => $arrDefinition) {
+                $arrTriggerFields   = $this->generateTriggerFields($arrDefinition['fields']);
+                $arrConditions      = $this->generateConditions($arrDefinition['fields']);
                 $arrAllFields       = array_unique(array_merge($arrTriggerFields, array_keys($arrConditions)));
 
-                $strBuffer = str_replace('</body>', $this->generateJS($formId, $arrTriggerFields, $arrConditions, $arrAllFields) . '</body>', $strBuffer);
+                $strBuffer = str_replace('</body>', $this->generateJS($formId, $arrDefinition['formSubmitId'], $arrTriggerFields, $arrConditions, $arrAllFields) . '</body>', $strBuffer);
             }
         }
 
         return $strBuffer;
     }
 
-    /**
-     * Generates the JS per form
-     * @param   string
-     * @param   array
-     * @return  string
-     */
-    private function generateJS($formId, $arrTriggerFields, $arrConditions, $arrAllFields)
+    private function generateJS($formId, $formSubmitId, $arrTriggerFields, $arrConditions, $arrAllFields)
     {
+        // No need to generate any JS if the form does not have any conditions
+        if (!$arrTriggerFields) {
+            return '';
+        }
+
+        $previousStepsData = array();
+
+        // Compatibility with mp_forms
+        if (class_exists('MPFormsFormManager')) {
+            $manager = new \MPFormsFormManager($formId);
+            $previousStepsData = $manager->getDataOfAllSteps();
+            $previousStepsData = $previousStepsData['submitted'];
+        }
+
         return "
 <script>
 (function($) {
-    $('input[name=\"FORM_SUBMIT\"][value=\"" . $formId . "\"]').parents('form').conditionalFormFields({
+    $('input[name=\"FORM_SUBMIT\"][value=\"" . $formSubmitId . "\"]').parents('form').conditionalFormFields({
         'fields': " . json_encode($arrTriggerFields) . ",
-        'conditions': " . json_encode($arrConditions) . "
+        'conditions': " . json_encode($arrConditions) . ",
+        'previousValues': " . json_encode($previousStepsData) . "
     });
 })(jQuery);
 </script>";
