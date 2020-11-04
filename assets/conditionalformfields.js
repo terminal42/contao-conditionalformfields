@@ -2,8 +2,8 @@
     "use strict";
 
     // Create the defaults once
-    var pluginName = "conditionalFormFields";
-    var defaults = {
+    let pluginName = "conditionalFormFields";
+    let defaults = {
         fields: [],
         conditions: {},
         previousValues: {}
@@ -21,7 +21,7 @@
     // Avoid Plugin.prototype conflicts
     $.extend(ConditionalFormFields.prototype, {
         init: function() {
-            var $this = this;
+            let $this = this;
 
             $this.initFields();
             $this.initFieldsets();
@@ -32,14 +32,14 @@
             });
         },
         initFields: function() {
-            var $this = this;
+            let $this = this;
 
             $this.fields = {};
 
             $($this.settings.fields).each(function(i, field) {
                 $($this.element).find('*[name^="' + field + '"]').each(function() {
-                    var field = $(this);
-                    var name = field.attr('name');
+                    let field = $(this);
+                    let name = field.attr('name');
 
                     // Array
                     if (name.substr(name.length - 2) == '[]') {
@@ -69,12 +69,12 @@
             });
         },
         initFieldsets: function() {
-            var $this = this;
+            let $this = this;
 
             $this.fieldsets = {};
             $this.fieldsetFields = {};
 
-            for (var id in $this.settings.conditions) {
+            for (let id in $this.settings.conditions) {
                 $this.fieldsets[id] = $('.cffs-' + id);
                 $this.fieldsetFields[id] = $this.fieldsets[id].find('input, select, textarea');
             }
@@ -82,12 +82,12 @@
             $this.toggleFieldsets();
         },
         toggleFieldsets: function() {
-            var $this = this;
-            var values = $this.getFieldValues();
+            let $this = this;
+            let values = $this.getFieldValues();
 
-            for (var id in $this.settings.conditions) {
-                var condition = 'var in_array = function(needle, haystack) { return jQuery.isArray(haystack) ? (jQuery.inArray(needle, haystack) != -1) : false; }; ' + $this.settings.conditions[id];
-                var fn = new Function('values', condition);
+            for (let id in $this.settings.conditions) {
+                let condition = 'let in_array = function(needle, haystack) { return jQuery.isArray(haystack) ? (jQuery.inArray(needle, haystack) != -1) : false; }; ' + $this.settings.conditions[id];
+                let fn = new Function('values', condition);
 
                 if (!fn(values)) {
                     $this.hideFieldset(id);
@@ -111,9 +111,9 @@
             });
         },
         getFieldValues: function() {
-            var $this = this;
-            var values = $this.settings.previousValues;
-            var value = null;
+            let $this = this;
+            let values = $this.settings.previousValues.slice();
+            let value = null;
 
             $.each($this.fields, function(name) {
                 if ($.isArray(this)) {
