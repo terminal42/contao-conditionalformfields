@@ -112,7 +112,7 @@
         },
         getFieldValues: function() {
             let $this = this;
-            let values = $this.settings.previousValues.slice();
+            let values = Object.assign({}, $this.settings.previousValues);
             let value = null;
 
             $.each($this.fields, function(name) {
@@ -140,11 +140,7 @@
                         }
                     });
                 } else {
-                    value = $this.getFieldValue(this);
-
-                    if (value) {
-                        values[name] = value;
-                    }
+                    values[name] = $this.getFieldValue(this);
                 }
             });
 
