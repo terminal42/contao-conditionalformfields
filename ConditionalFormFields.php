@@ -184,7 +184,7 @@ class ConditionalFormFields extends Controller
 
                 foreach ($fieldModels as $fieldModel) {
                     // Load post value with priority if available
-                    if ($_POST[$fieldModel->name]) {
+                    if (array_key_exists($fieldModel->name, $_POST)) {
                         $data[$fieldModel->name] = \Input::post($fieldModel->name);
                         continue;
                     }
