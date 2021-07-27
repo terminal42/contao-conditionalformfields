@@ -18,6 +18,12 @@
         this.init();
     }
 
+    function htmlDecode(i){
+        let e = document.createElement('textarea');
+        e.innerHTML = i;
+        return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+    }
+
     // Avoid Plugin.prototype conflicts
     $.extend(ConditionalFormFields.prototype, {
         init: function() {
@@ -86,7 +92,8 @@
             let values = $this.getFieldValues();
 
             for (let id in $this.settings.conditions) {
-                let condition = 'let in_array = function(needle, haystack) { return jQuery.isArray(haystack) ? (jQuery.inArray(needle, haystack) != -1) : false; }; ' + $this.settings.conditions[id];
+                let condition = 'let in_array = function(needle, haystack) { return jQuery.isArray(haystack) ? (jQuery.inArray(needle, haystack) != -1) : false; }, ' +
+                    'in_string = function(needle, haystack) { return haystack.includes(needle); }; ' + htmlDecode($this.settings.conditions[id]);
                 let fn = new Function('values', condition);
 
                 if (!fn(values)) {
