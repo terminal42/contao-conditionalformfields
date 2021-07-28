@@ -17,7 +17,7 @@ in_array('bar', $foo)
 You can also check if a field contains a string (e.g. if hidden field with multiple values need to be checked):
 
 ```
-in_string('bar', $foo)
+str_contains('bar', $foo)
 ```
 
 To validate a single checkbox simply compare its value:

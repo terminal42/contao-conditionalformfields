@@ -265,6 +265,7 @@ class ConditionalFormFields extends Controller
             $strCondition = preg_replace("/\\$([A-Za-z0-9_]+)/u", "values.$1", $strCondition);
         } else {
             $strCondition = str_replace('in_array', '@in_array', $strCondition);
+            $strCondition = str_replace('str_contains', '@str_contains', $strCondition);
             $strCondition = preg_replace("/\\$([A-Za-z0-9_]+)/u", '$arrPost[\'$1\']', $strCondition);
         }
 
