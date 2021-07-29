@@ -93,7 +93,7 @@
 
             for (let id in $this.settings.conditions) {
                 let condition = 'let in_array = function(needle, haystack) { return jQuery.isArray(haystack) ? (jQuery.inArray(needle, haystack) != -1) : false; }, ' +
-                    'str_contains = function(needle, haystack) { return haystack.includes(needle); }; ' + htmlDecode($this.settings.conditions[id]);
+                    'str_contains = function(haystack, needle) { return haystack.includes(needle); }; ' + htmlDecode($this.settings.conditions[id]);
                 let fn = new Function('values', condition);
 
                 if (!fn(values)) {
