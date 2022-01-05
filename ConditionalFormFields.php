@@ -208,8 +208,8 @@ class ConditionalFormFields extends Controller
      */
     public function outputFrontendTemplate($strBuffer, $strTemplate)
     {
-        if ($arrForms = $GLOBALS['CONDITIONALFORMFIELDS']) {
-            foreach ($arrForms as $formId => $arrDefinition) {
+        if (!empty($GLOBALS['CONDITIONALFORMFIELDS'])) {
+            foreach ($GLOBALS['CONDITIONALFORMFIELDS'] as $formId => $arrDefinition) {
                 $arrTriggerFields   = $this->generateTriggerFields($arrDefinition['fields']);
                 $arrConditions      = $this->generateConditions($arrDefinition['fields']);
                 $arrAllFields       = array_unique(array_merge($arrTriggerFields, array_keys($arrConditions)));
