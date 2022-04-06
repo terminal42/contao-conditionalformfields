@@ -19,4 +19,3 @@ To validate a single checkbox simply compare its value:
 ```
 $foo == '1'
 ```
-Make sure jQuery is loaded for this to work. 
