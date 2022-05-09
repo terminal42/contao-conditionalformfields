@@ -1,6 +1,6 @@
-"use strict";
-
 (function () {
+    "use strict";
+ 
     const initialized = [];
 
     function init (node) {
