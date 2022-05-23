@@ -1,6 +1,6 @@
 (function () {
     "use strict";
- 
+
     const initialized = [];
 
     function init (node) {
@@ -13,19 +13,18 @@
 
             const form = el.form;
             const condition = el.getAttribute('data-cff-condition');
-            let fields = null;
 
             Array.from(form.elements).forEach(function (control) {
                 control.addEventListener('change', function () {
-                    fields = toggleFieldset(el, fields, condition, getFormData(form));
+                    toggleFieldset(el, condition, getFormData(form));
                 });
             })
 
-            fields = toggleFieldset(el, fields, condition, getFormData(form));
+            toggleFieldset(el, condition, getFormData(form));
         });
     }
 
-    function toggleFieldset (fieldset, fields, condition, formData) {
+    function toggleFieldset (fieldset, condition, formData) {
         let fnBody = '"use strict";';
         fnBody += 'function in_array (needle, haystack) { return Array.isArray(haystack) ? haystack.includes(needle) : false; };';
         fnBody += 'function str_contains (haystack, needle) { return String(haystack).includes(needle) };'
@@ -39,23 +38,12 @@
         let fn = new Function('values', fnBody);
 
         if (fn.call(undefined, formData)) {
-            if (fields) {
-                fieldset.append(...fields);
-                return null;
-            }
+            fieldset.disabled = false
+            fieldset.style.display = 'initial';
         } else {
-            if (!fields) {
-                const removed = [];
-                Array.from(fieldset.children).forEach(function (field) {
-                    removed.push(field);
-                    field.remove();
-                });
-
-                return removed;
-            }
+            fieldset.disabled = true
+            fieldset.style.display = 'none';
         }
-
-        return fields;
     }
 
     function getFormData (form) {
