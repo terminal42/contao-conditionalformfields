@@ -30,7 +30,11 @@
         fnBody += 'function str_contains (haystack, needle) { return String(haystack).includes(needle) };'
 
         formData.forEach(function (value, key) {
-            fnBody += `const ${key} = values.get('${key}');`;
+            if (String(key).includes('-')) {
+                console.warn(`terminal42/contao-conditionalformfields: skipping "${key}", special characters [-] are not supported in JavaScript variables.`);
+            } else {
+                fnBody += `const ${key} = values.get('${key}');`;
+            }
         });
 
         fnBody += `return ${condition};`;
