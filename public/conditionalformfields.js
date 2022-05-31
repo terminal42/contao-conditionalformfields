@@ -43,7 +43,7 @@ console.log(formData);
 
         if (fn.call(undefined, formData)) {
             fieldset.disabled = false
-            fieldset.style.display = 'initial';
+            fieldset.style.display = '';
         } else {
             fieldset.disabled = true
             fieldset.style.display = 'none';
