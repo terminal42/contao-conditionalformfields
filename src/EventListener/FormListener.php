@@ -6,6 +6,7 @@ namespace Terminal42\ConditionalformfieldsBundle\EventListener;
 
 use Contao\CoreBundle\ServiceAnnotation\Hook;
 use Contao\Form;
+use Contao\FormFieldModel;
 use Contao\Widget;
 use Terminal42\ConditionalformfieldsBundle\FormHandler;
 
@@ -21,8 +22,12 @@ class FormListener
      */
     public function onCompileFormFields(array $fields, string $formId, Form $form): array
     {
+        if (!$this->hasConditions($fields)) {
+            return $fields;
+        }
+
         if (isset($this->handlers[$formId])) {
-            throw new \RuntimeException("Duplicate form ID $formId");
+            throw new \RuntimeException("terminal42/contao-conditionalformfields: The same form (ID $formId) with conditions cannot be placed on the same page.");
         }
 
         $this->handlers[$formId] = new FormHandler($form, $fields);
@@ -52,5 +57,19 @@ class FormListener
         }
 
         return $widget;
+    }
+
+    /**
+     * @param array<FormFieldModel> $fields
+     */
+    private function hasConditions(array $fields): bool
+    {
+        foreach ($fields as $field) {
+            if ('fieldsetStart' === $field->type && $field->isConditionalFormField) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
