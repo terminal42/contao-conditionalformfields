@@ -28,7 +28,7 @@
         let fnBody = '"use strict";';
         fnBody += 'function in_array (needle, haystack) { return Array.isArray(haystack) ? haystack.includes(needle) : false; };';
         fnBody += 'function str_contains (haystack, needle) { return String(haystack).includes(needle) };'
-console.log(formData);
+
         formData.forEach(function (value, key) {
             if (String(key).includes('-')) {
                 console.warn(`terminal42/contao-conditionalformfields: skipping "${key}", special characters [-] are not supported in JavaScript variables.`);
