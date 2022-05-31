@@ -19,10 +19,11 @@ class ConditionMigration extends AbstractMigration
 
     public function shouldRun(): bool
     {
-        $schemaManager = $this->connection->createSchemaManager();
+        $schemaManager = $this->connection->getSchemaManager();
 
         if (
-            !$schemaManager->tablesExist('tl_form_field')
+            null === $schemaManager
+            || !$schemaManager->tablesExist('tl_form_field')
             || !\array_key_exists('conditionalformfieldcondition', $schemaManager->listTableColumns('tl_form_field'))
         ) {
             return false;
