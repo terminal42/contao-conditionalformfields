@@ -46,7 +46,7 @@ class FormHandler
                 continue;
             }
 
-            $this->fields[$field->id] = $fieldsets;
+            $this->fields[(string) $field->id] = $fieldsets;
 
             if (!empty($field->name)) {
                 $this->formData[$field->name] = $this->getInput($field->name);
@@ -84,7 +84,7 @@ class FormHandler
         // errors to none on them (ugly with reflection but there's no setter
         // on the Widget class so...)
 
-        if ($this->isHidden($widget->id)) {
+        if ($this->isHidden((string) $widget->id)) {
             $reflection = new \ReflectionClass($widget);
 
             $errors = $reflection->getProperty('arrErrors');
