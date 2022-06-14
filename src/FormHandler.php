@@ -93,7 +93,7 @@ class FormHandler
 
             $class = $reflection->getProperty('strClass');
             $class->setAccessible(true);
-            $class->setValue($widget, preg_replace('{(^| )error( |$)}', '', $widget->class));
+            $class->setValue($widget, preg_replace('{(^| )error( |$)}', '', (string) $widget->class));
 
             // Widget needs to be set to disabled (#17)
             $widget->disabled = true;
