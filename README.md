@@ -19,3 +19,7 @@ To validate a single checkbox simply compare its value:
 ```
 foo == '1'
 ```
+
+### Note for Version 3
+The field names had a prefix `$` until version 3 - this is no longer necessary.
+When updating to version 3, the conditions are automatically adjusted.
