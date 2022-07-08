@@ -4,6 +4,10 @@ contao-conditionalformfields
 Allows you to display a form field based on a condition which allows you to do something like "only display the field
 when value of field 'foo' is 'bar' and 'bla' is 'yes'".
 
+The condition is not entered directly at the form field, but a field set with start and end must be created.
+The condition can be entered in the start of field set. The field set can also be used to control several form
+fields in the view.
+
 ```
 foo == 'bar' && bla == 'yes'
 ```
