@@ -4,30 +4,46 @@ declare(strict_types=1);
 
 namespace Terminal42\ConditionalformfieldsBundle\EventListener;
 
+use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\CoreBundle\ServiceAnnotation\Hook;
 use Contao\Form;
 use Contao\FormFieldModel;
 use Contao\Widget;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Terminal42\ConditionalformfieldsBundle\FormHandler;
 
 class FormListener
 {
+    private RequestStack $requestStack;
+    private ScopeMatcher $scopeMatcher;
+
     /**
      * @var array<FormHandler>
      */
     private $handlers = [];
+
+    public function __construct(RequestStack $requestStack, ScopeMatcher $scopeMatcher)
+    {
+        $this->requestStack = $requestStack;
+        $this->scopeMatcher = $scopeMatcher;
+    }
 
     /**
      * @Hook("compileFormFields")
      */
     public function onCompileFormFields(array $fields, string $formId, Form $form): array
     {
+        // mp_forms is calling the "compileFormFields" hook in the back end
+        if (!($request = $this->requestStack->getCurrentRequest()) || $this->scopeMatcher->isBackendRequest($request)) {
+            return $fields;
+        }
+
         if (!$this->hasConditions($fields)) {
             return $fields;
         }
 
         if (isset($this->handlers[$formId])) {
-            throw new \RuntimeException("terminal42/contao-conditionalformfields: The same form (ID $formId) with conditions cannot be placed on the same page.");
+            return $fields;
         }
 
         $this->handlers[$formId] = new FormHandler($form, $fields);

@@ -158,11 +158,11 @@ class FormHandler
     private function getPreviousDataFromMpForms(): array
     {
         // Compatibility with terminal42/contao-mp_forms
-        if (!class_exists(\MPFormsFormManager::class)) {
+        if (!class_exists(\MPFormsSessionManager::class)) {
             return [];
         }
 
-        $manager = new \MPFormsFormManager($this->form->id);
+        $manager = new \MPFormsSessionManager($this->form->id);
         $previousStepsData = $manager->getDataOfAllSteps();
 
         return $previousStepsData['submitted'];
