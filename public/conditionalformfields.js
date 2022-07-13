@@ -98,20 +98,28 @@
         return data;
     }
 
-    init(document);
-    new MutationObserver(function (mutationsList) {
-        for(const mutation of mutationsList) {
-            if (mutation.type === 'childList') {
-                mutation.addedNodes.forEach(function (element) {
-                    if (element.querySelectorAll) {
-                        init(element)
-                    }
-                })
+    function load () {
+        init(document);
+        new MutationObserver(function (mutationsList) {
+            for (const mutation of mutationsList) {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach(function (element) {
+                        if (element.querySelectorAll) {
+                            init(element)
+                        }
+                    })
+                }
             }
-        }
-    }).observe(document, {
-        attributes: false,
-        childList: true,
-        subtree: true
-    });
+        }).observe(document, {
+            attributes: false,
+            childList: true,
+            subtree: true
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', load);
+    } else {
+        load();
+    }
 })();
