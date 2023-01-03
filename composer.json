@@ -27,7 +27,7 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
-        "contao/core-bundle": "^4.9 || ^5.0",
+        "contao/core-bundle": "^4.13 || ^5.0",
         "doctrine/dbal": "^2.11 || ^3"
     },
     "require-dev": {
