@@ -12,7 +12,6 @@ use Contao\System;
 use Contao\Widget;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Terminal42\MultipageFormsBundle\FormManager;
 use Terminal42\MultipageFormsBundle\FormManagerFactoryInterface;
 
 class FormHandler
