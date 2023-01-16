@@ -32,7 +32,7 @@
     },
     "require-dev": {
         "contao/manager-plugin": "^2.0",
-        "terminal42/contao-mp_forms": "^5.0"
+        "terminal42/contao-mp_forms": "^4.4 || ^5.0"
     },
     "conflict": {
         "contao/manager-plugin": "<2.0 || >=3.0",
