@@ -27,16 +27,16 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
-        "contao/core-bundle": "^4.9",
+        "contao/core-bundle": "^4.13 || ^5.0",
         "doctrine/dbal": "^2.11 || ^3"
     },
     "require-dev": {
         "contao/manager-plugin": "^2.0",
-        "terminal42/contao-mp_forms": "^4.4"
+        "terminal42/contao-mp_forms": "^4.4 || ^5.0"
     },
     "conflict": {
         "contao/manager-plugin": "<2.0 || >=3.0",
-        "terminal42/contao-mp_forms": "<4.4 || >=5.0"
+        "terminal42/contao-mp_forms": "<4.4"
     },
     "autoload": {
         "psr-4": {

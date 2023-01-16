@@ -8,9 +8,11 @@ use Contao\Form;
 use Contao\FormFieldModel;
 use Contao\Input;
 use Contao\StringUtil;
+use Contao\System;
 use Contao\Widget;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Terminal42\MultipageFormsBundle\FormManagerFactoryInterface;
 
 class FormHandler
 {
@@ -157,14 +159,23 @@ class FormHandler
 
     private function getPreviousDataFromMpForms(): array
     {
-        // Compatibility with terminal42/contao-mp_forms
-        if (!class_exists(\MPFormsSessionManager::class)) {
-            return [];
+        // MP Forms v5
+        if (System::getContainer()->has(FormManagerFactoryInterface::class)) {
+            /** @var FormManagerFactoryInterface $factory */
+            $factory = System::getContainer()->get(FormManagerFactoryInterface::class);
+            $previousStepsData = $factory->forFormId((int) $this->form->id)->getDataOfAllSteps();
+
+            return $previousStepsData['submitted'];
         }
 
-        $manager = new \MPFormsSessionManager($this->form->id);
-        $previousStepsData = $manager->getDataOfAllSteps();
+        // MP Forms v4
+        if (class_exists(\MPFormsSessionManager::class)) {
+            $manager = new \MPFormsSessionManager($this->form->id);
+            $previousStepsData = $manager->getDataOfAllSteps();
 
-        return $previousStepsData['submitted'];
+            return $previousStepsData['submitted'];
+        }
+
+        return [];
     }
 }
