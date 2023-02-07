@@ -91,7 +91,7 @@
             }
 
             if (!data.has(name)) {
-                data.set(control.name, value);
+                data.set(name, value);
             }
         })
 
