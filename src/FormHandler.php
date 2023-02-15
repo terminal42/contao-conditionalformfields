@@ -163,7 +163,12 @@ class FormHandler
         if (System::getContainer()->has(FormManagerFactoryInterface::class)) {
             /** @var FormManagerFactoryInterface $factory */
             $factory = System::getContainer()->get(FormManagerFactoryInterface::class);
-            $previousStepsData = $factory->forFormId((int) $this->form->id)->getDataOfAllSteps();
+            $manager = $factory->forFormId((int) $this->form->id);
+            if ($manager->isPreparing()) {
+                return [];
+            }
+
+            $previousStepsData = $manager->getDataOfAllSteps();
 
             return $previousStepsData['submitted'];
         }
