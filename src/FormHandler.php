@@ -58,7 +58,7 @@ class FormHandler
         if (!empty($this->conditions)) {
             // Add CSS class for current form
             $formAttributes = StringUtil::deserialize($form->attributes, true);
-            $formAttributes[1] = trim($formAttributes[1].' cff');
+            $formAttributes[1] = trim(($formAttributes[1] ?? '').' cff');
 
             if (!empty(($previousData = $this->getPreviousDataFromMpForms()))) {
                 $formAttributes[1] .= '" data-cff-previous="'.StringUtil::specialcharsAttribute(json_encode($previousData, JSON_THROW_ON_ERROR));
