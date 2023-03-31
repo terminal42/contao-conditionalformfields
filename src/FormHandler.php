@@ -31,7 +31,19 @@ class FormHandler
         $this->form = $form;
 
         $this->expressionLanguage = new ExpressionLanguage();
-        $this->expressionLanguage->addFunction(ExpressionFunction::fromPhp('in_array'));
+        $this->expressionLanguage->addFunction(
+            new ExpressionFunction(
+                'in_array',
+                static fn ($needle, $haystack) => sprintf('(\is_array(%2$s) ? \in_array(%1$s, %2$s, true) : %1$s)', $needle, $haystack),
+                static function ($arguments, $needle, $haystack) {
+                    if (!\is_array($haystack)) {
+                        return false;
+                    }
+
+                    return \in_array($needle, $haystack, true);
+                }
+            )
+        );
         $this->expressionLanguage->addFunction(ExpressionFunction::fromPhp('str_contains'));
 
         $fieldsets = [];
@@ -164,6 +176,7 @@ class FormHandler
             /** @var FormManagerFactoryInterface $factory */
             $factory = System::getContainer()->get(FormManagerFactoryInterface::class);
             $manager = $factory->forFormId((int) $this->form->id);
+
             if ($manager->isPreparing()) {
                 return [];
             }
