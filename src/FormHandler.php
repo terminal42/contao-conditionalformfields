@@ -183,7 +183,7 @@ class FormHandler
 
             $previousStepsData = $manager->getDataOfAllSteps();
 
-            return $previousStepsData['submitted'];
+            return $previousStepsData->getAllSubmitted();
         }
 
         // MP Forms v4
