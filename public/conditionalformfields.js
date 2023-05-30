@@ -30,8 +30,8 @@
         fnBody += 'function str_contains (haystack, needle) { return String(haystack).includes(needle) };'
 
         formData.forEach(function (value, key) {
-            if (String(key).includes('-')) {
-                console.warn(`terminal42/contao-conditionalformfields: skipping "${key}", special characters [-] are not supported in JavaScript variables.`);
+            if (String(key).includes('-') || String(key).includes('[')) {
+                console.warn(`terminal42/contao-conditionalformfields: skipping "${key}", special characters [-] and brackets are not supported in JavaScript variables.`);
             } else {
                 fnBody += `const ${key} = values.get('${key}');`;
             }
