@@ -6,6 +6,7 @@ namespace Terminal42\ConditionalformfieldsBundle;
 
 use Contao\Form;
 use Contao\FormFieldModel;
+use Contao\FormFieldsetStart;
 use Contao\Input;
 use Contao\StringUtil;
 use Contao\System;
@@ -84,8 +85,8 @@ class FormHandler
 
     public function prepareField(Widget $widget): void
     {
-        // Add a CSS class to conditional fieldset so we can find and trigger them through JS
-        if ($widget->isConditionalFormField) {
+        // Add a CSS class to conditional fieldset, so we can find and trigger them through JS
+        if ($widget instanceof FormFieldsetStart && $widget->isConditionalFormField) {
             $widget->class = '" data-cff-condition="'.StringUtil::specialcharsAttribute($widget->conditionalFormFieldCondition);
         }
     }
