@@ -22,7 +22,7 @@ class ConditionValidationListener
         $this->connection = $connection;
     }
 
-    public function __invoke(string $expression, DataContainer $dc)
+    public function __invoke(string $expression, DataContainer $dc): string
     {
         if (empty($expression)) {
             return $expression;

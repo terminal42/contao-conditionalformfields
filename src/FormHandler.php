@@ -142,7 +142,7 @@ class FormHandler
     }
 
     /**
-     * @return \callable|false
+     * @return \callable|true
      */
     private function createCondition(string $condition)
     {
