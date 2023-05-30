@@ -110,8 +110,13 @@ class FormHandler
             $class->setAccessible(true);
             $class->setValue($widget, preg_replace('{(^| )error( |$)}', '', (string) $widget->class));
 
-            // Widget needs to be set to disabled (#17)
-            $widget->disabled = true;
+            // Widget must not submit their input if they are hidden
+            // We previously used "disabled = true" (see #18) but that will result in the
+            // field being disabled on subsequent run, since v3 only toggles the fieldset.
+            $submitInput = $reflection->getProperty('blnSubmitInput');
+            $submitInput->setAccessible(true);
+            $submitInput->setValue($widget, false);
+
             $widget->value = null;
         }
     }
