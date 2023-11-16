@@ -49,7 +49,7 @@ class ConditionValidationListener
                 Token::OPERATOR_TYPE === $tokens[$i]->type
                 && !\in_array($tokens[$i]->value, ['&&', '||', '!', '==', '!=', '<', '>', '<=', '>='], true)
             ) {
-                throw new \RuntimeException("Unexpected operator \"{$tokens[$i]->value}\" around position {$tokens[$i]->cursor}");
+                throw new \RuntimeException(sprintf('Unexpected operator "%s" around position %s', $tokens[$i]->value, $tokens[$i]->cursor));
             }
 
             if (!$tokens[$i]->test(Token::NAME_TYPE)) {
@@ -66,7 +66,7 @@ class ConditionValidationListener
             // Validate functions
             if (isset($tokens[$i + 1]) && '(' === $tokens[$i + 1]->value) {
                 if (!\in_array($tokens[$i]->value, ['in_array', 'str_contains'], true)) {
-                    throw new \RuntimeException("Unexpected function \"{$tokens[$i]->value}\" around position {$tokens[$i]->cursor}");
+                    throw new \RuntimeException(sprintf('Unexpected function "%s" around position %s', $tokens[$i]->value, $tokens[$i]->cursor));
                 }
 
                 ++$i;
@@ -90,7 +90,7 @@ class ConditionValidationListener
         if (!empty($unknown)) {
             $unknown = $unknown[0];
 
-            throw new \RuntimeException("Unknown field name \"$unknown\" around position $variables[$unknown]");
+            throw new \RuntimeException(sprintf('Unknown field name "%s" around position %s', $unknown, $variables[$unknown]));
         }
 
         return $expression;

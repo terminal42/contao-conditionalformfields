@@ -9,7 +9,6 @@ use Contao\FormFieldModel;
 use Contao\FormFieldsetStart;
 use Contao\Input;
 use Contao\StringUtil;
-use Contao\System;
 use Contao\Widget;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -18,18 +17,24 @@ use Terminal42\MultipageFormsBundle\FormManagerFactoryInterface;
 class FormHandler
 {
     private Form $form;
+
+    private ?FormManagerFactoryInterface $formManagerFactory;
+
     private ExpressionLanguage $expressionLanguage;
 
     private array $conditions = [];
+
     private array $fields = [];
+
     private array $formData = [];
 
     /**
      * @param array<FormFieldModel> $fields
      */
-    public function __construct(Form $form, array $fields)
+    public function __construct(Form $form, array $fields, ?FormManagerFactoryInterface $formManagerFactory = null)
     {
         $this->form = $form;
+        $this->formManagerFactory = $formManagerFactory;
 
         $this->expressionLanguage = new ExpressionLanguage();
         $this->expressionLanguage->addFunction(
@@ -42,8 +47,8 @@ class FormHandler
                     }
 
                     return \in_array($needle, $haystack, true);
-                }
-            )
+                },
+            ),
         );
         $this->expressionLanguage->addFunction(ExpressionFunction::fromPhp('str_contains'));
 
@@ -73,7 +78,7 @@ class FormHandler
             $formAttributes = StringUtil::deserialize($form->attributes, true);
             $formAttributes[1] = trim(($formAttributes[1] ?? '').' cff');
 
-            if (!empty(($previousData = $this->getPreviousDataFromMpForms()))) {
+            if (!empty($previousData = $this->getPreviousDataFromMpForms())) {
                 $formAttributes[1] .= '" data-cff-previous="'.StringUtil::specialcharsAttribute(json_encode($previousData, JSON_THROW_ON_ERROR));
             }
 
@@ -147,7 +152,7 @@ class FormHandler
     }
 
     /**
-     * @return \callable|true
+     * @return \Closure|true
      */
     private function createCondition(?string $condition)
     {
@@ -158,6 +163,9 @@ class FormHandler
         return fn () => (bool) $this->expressionLanguage->evaluate($condition, $this->formData);
     }
 
+    /**
+     * @return array|string|null
+     */
     private function getInput(string $fieldName)
     {
         $value = 'get' === $this->form->method ? Input::get($fieldName, false, true) : Input::post($fieldName);
@@ -178,10 +186,8 @@ class FormHandler
     private function getPreviousDataFromMpForms(): array
     {
         // MP Forms v5
-        if (System::getContainer()->has(FormManagerFactoryInterface::class)) {
-            /** @var FormManagerFactoryInterface $factory */
-            $factory = System::getContainer()->get(FormManagerFactoryInterface::class);
-            $manager = $factory->forFormId((int) $this->form->id);
+        if (null !== $this->formManagerFactory) {
+            $manager = $this->formManagerFactory->forFormId((int) $this->form->id);
 
             if ($manager->isPreparing()) {
                 return [];

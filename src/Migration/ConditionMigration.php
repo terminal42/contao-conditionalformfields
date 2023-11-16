@@ -31,14 +31,14 @@ class ConditionMigration extends AbstractMigration
 
         return
             $this->connection->fetchOne(
-                "SELECT COUNT(*) FROM tl_form_field WHERE conditionalFormFieldCondition REGEXP '(^|[^\\'\"])[$]([a-z0-9_]+)'"
+                "SELECT COUNT(*) FROM tl_form_field WHERE conditionalFormFieldCondition REGEXP '(^|[^\\'\"])[$]([a-z0-9_]+)'",
             ) > 0;
     }
 
     public function run(): MigrationResult
     {
         $fields = $this->connection->fetchAllAssociative(
-            "SELECT id, conditionalFormFieldCondition FROM tl_form_field WHERE conditionalFormFieldCondition REGEXP '(^|[^\\'\"])[$]([a-z0-9_]+)'"
+            "SELECT id, conditionalFormFieldCondition FROM tl_form_field WHERE conditionalFormFieldCondition REGEXP '(^|[^\\'\"])[$]([a-z0-9_]+)'",
         );
 
         foreach ($fields as $field) {

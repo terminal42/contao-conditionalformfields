@@ -15,12 +15,13 @@ use Terminal42\ConditionalformfieldsBundle\FormHandler;
 class FormListener
 {
     private RequestStack $requestStack;
+
     private ScopeMatcher $scopeMatcher;
 
     /**
      * @var array<FormHandler>
      */
-    private $handlers = [];
+    private array $handlers = [];
 
     public function __construct(RequestStack $requestStack, ScopeMatcher $scopeMatcher)
     {
