@@ -149,7 +149,7 @@ class FormHandler
     /**
      * @return \callable|true
      */
-    private function createCondition(string $condition)
+    private function createCondition(?string $condition)
     {
         if (empty($condition)) {
             return true;
