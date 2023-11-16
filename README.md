@@ -24,6 +24,10 @@ To validate a single checkbox simply compare its value:
 foo == '1'
 ```
 
+**Characters not allowed in the field name:**
+
+The `-` character must not be used in the field names and numbers must not be followed by an underscore, e.g. `2_foo`.
+
 ### Note for Version 3
 The field names had a prefix `$` until version 3 - this is no longer necessary.
 When updating to version 3, the conditions are automatically adjusted.
