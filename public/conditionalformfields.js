@@ -30,10 +30,11 @@
         fnBody += 'function str_contains (haystack, needle) { return String(haystack).includes(needle) }\n\n'
 
         formData.forEach(function (value, key) {
-            if (String(key).includes('-') || String(key).includes('[')) {
-                console.warn(`terminal42/contao-conditionalformfields: skipping "${key}", special characters [-] and brackets are not supported in JavaScript variables.`);
-            } else {
+
+            if (/^(?!(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$)[$A-Z_a-z][$A-Z_a-z0-9]*$/.test(key)) {
                 fnBody += `const ${key} = values.get('${key}');\n`;
+            } else {
+                console.warn(`terminal42/contao-conditionalformfields: skipping "${key}", this name is not supported in JavaScript variables.`);
             }
         });
 

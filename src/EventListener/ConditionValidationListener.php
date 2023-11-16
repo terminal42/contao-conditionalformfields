@@ -93,6 +93,12 @@ class ConditionValidationListener
             throw new \RuntimeException(sprintf('Unknown field name "%s" around position %s', $unknown, $variables[$unknown]));
         }
 
+        foreach ($variables as $variable => $position) {
+            if (!preg_match('/^(?!(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$)[$A-Z_a-z][$A-Z_a-z0-9]*$/', $variable)) {
+                throw new \RuntimeException(sprintf('Unsupported variable name "%s" around position %s', $variable, $position));
+            }
+        }
+
         return $expression;
     }
 }
