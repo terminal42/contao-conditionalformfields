@@ -25,20 +25,19 @@
     }
 
     function toggleFieldset (fieldset, condition, formData) {
-        let fnBody = '"use strict";';
-        fnBody += 'function in_array (needle, haystack) { return Array.isArray(haystack) ? haystack.includes(needle) : false; };';
-        fnBody += 'function str_contains (haystack, needle) { return String(haystack).includes(needle) };'
+        let fnBody = '"use strict";\n\n';
+        fnBody += 'function in_array (needle, haystack) { return !!Object.values(haystack).find(v => v == needle) }\n';
+        fnBody += 'function str_contains (haystack, needle) { return String(haystack).includes(needle) }\n\n'
 
         formData.forEach(function (value, key) {
             if (String(key).includes('-') || String(key).includes('[')) {
                 console.warn(`terminal42/contao-conditionalformfields: skipping "${key}", special characters [-] and brackets are not supported in JavaScript variables.`);
             } else {
-                fnBody += `const ${key} = values.get('${key}');`;
+                fnBody += `const ${key} = values.get('${key}');\n`;
             }
         });
 
-        fnBody += `return ${condition};`;
-
+        fnBody += `\nreturn ${condition};`;
         let fn = new Function('values', fnBody);
 
         if (fn.call(undefined, formData)) {
@@ -93,7 +92,14 @@
             if (!data.has(name)) {
                 data.set(control.name, value);
             }
-        })
+        });
+
+        // Convert arrays to temporary objects to enforce in_array check
+        data.forEach(function (value, key) {
+            if (Array.isArray(value)) {
+                data.set(key, Object.fromEntries(value.entries()));
+            }
+        });
 
         return data;
     }
