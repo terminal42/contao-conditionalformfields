@@ -1,0 +1,4 @@
+operand: 'Unexpected operator "{value}" around position {cursor}.'
+function: 'Unexpected function "{value}" around position {cursor}.'
+field: 'Unknown field name "{value}" around position {cursor}.'
+variable: 'Unsupported variable name "{value}" around position {cursor}.'

@@ -1,0 +1,4 @@
+operand: 'Unerwartete Operation "{value}" bei Position {cursor}.'
+function: 'Unerwartete Funktion "{value}" bei Position {cursor}.'
+field: 'Unbekanntes Feld "{value}" bei Position {cursor}.'
+variable: 'Ungültige Variable "{value}" bei Position {cursor}.'
