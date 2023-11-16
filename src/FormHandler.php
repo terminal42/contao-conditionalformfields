@@ -40,14 +40,8 @@ class FormHandler
         $this->expressionLanguage->addFunction(
             new ExpressionFunction(
                 'in_array',
-                static fn ($needle, $haystack) => sprintf('(\is_array(%2$s) ? \in_array(%1$s, %2$s, true) : %1$s)', $needle, $haystack),
-                static function ($arguments, $needle, $haystack) {
-                    if (!\is_array($haystack)) {
-                        return false;
-                    }
-
-                    return \in_array($needle, $haystack, true);
-                },
+                static fn ($needle, $haystack) => sprintf('\in_array(%s, (array) %s, false))', $needle, $haystack),
+                static fn ($arguments, $needle, $haystack) => \in_array($needle, (array) $haystack, false),
             ),
         );
         $this->expressionLanguage->addFunction(ExpressionFunction::fromPhp('str_contains'));
