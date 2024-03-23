@@ -34,6 +34,11 @@ class FormHandler
     public function __construct(Form $form, array $fields, ?FormManagerFactoryInterface $formManagerFactory = null)
     {
         $this->form = $form;
+
+        if (null === $formManagerFactory && \interface_exists(FormManagerFactoryInterface::class)) {
+            /** @var FormManagerFactoryInterface $formManagerFactory */
+            $formManagerFactory = System::getContainer()->get(FormManagerFactoryInterface::class);
+        }
         $this->formManagerFactory = $formManagerFactory;
 
         $this->expressionLanguage = new ExpressionLanguage();
