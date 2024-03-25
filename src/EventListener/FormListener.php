@@ -11,6 +11,7 @@ use Contao\FormFieldModel;
 use Contao\Widget;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Terminal42\ConditionalformfieldsBundle\FormHandler;
+use Terminal42\MultipageFormsBundle\FormManagerFactoryInterface;
 
 class FormListener
 {
@@ -18,15 +19,18 @@ class FormListener
 
     private ScopeMatcher $scopeMatcher;
 
+    private ?FormManagerFactoryInterface $formManagerFactory;
+
     /**
      * @var array<FormHandler>
      */
     private array $handlers = [];
 
-    public function __construct(RequestStack $requestStack, ScopeMatcher $scopeMatcher)
+    public function __construct(RequestStack $requestStack, ScopeMatcher $scopeMatcher, ?FormManagerFactoryInterface $formManagerFactory = null)
     {
         $this->requestStack = $requestStack;
         $this->scopeMatcher = $scopeMatcher;
+        $this->formManagerFactory = $formManagerFactory;
     }
 
     /**
@@ -47,7 +51,7 @@ class FormListener
             return $fields;
         }
 
-        $this->handlers[$formId] = new FormHandler($form, $fields);
+        $this->handlers[$formId] = new FormHandler($form, $fields, $this->formManagerFactory);
 
         return $fields;
     }
