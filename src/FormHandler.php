@@ -47,16 +47,31 @@ class FormHandler
         $this->expressionLanguage->addFunction(ExpressionFunction::fromPhp('str_contains'));
 
         $fieldsets = [];
+        $allFieldsets = [];
 
         foreach ($fields as $field) {
-            if ('fieldsetStart' === $field->type && $field->isConditionalFormField) {
-                $fieldsets[] = $field->id;
-                $this->conditions[$field->id] = $this->createCondition($field->conditionalFormFieldCondition);
+            if ('fieldsetStart' === $field->type) {
+                if ($field->isConditionalFormField) {
+                    $fieldsets[] = $field->id;
+                    $this->conditions[$field->id] = $this->createCondition($field->conditionalFormFieldCondition);
+                }
+
+                $allFieldsets[] = $field->id;
                 continue;
             }
 
             if ('fieldsetStop' === $field->type) {
-                array_pop($fieldsets);
+                // get the last added entry of all and conditional fieldsets
+                $lastFieldset = end($allFieldsets);
+                $lastConditionalFieldset = end($fieldsets);
+
+                // remove the last entry from all fieldsets (it's closed now)
+                array_pop($allFieldsets);
+                if ($lastFieldset === $lastConditionalFieldset) {
+                    // if the last entry of the conditional fieldsets is equal to the last entry of all fieldsets
+                    // close the "condition" fieldset as well
+                    array_pop($fieldsets);
+                }
                 continue;
             }
 
