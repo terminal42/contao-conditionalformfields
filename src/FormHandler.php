@@ -46,21 +46,30 @@ class FormHandler
         );
         $this->expressionLanguage->addFunction(ExpressionFunction::fromPhp('str_contains'));
 
+        $conditions = [];
         $fieldsets = [];
 
         foreach ($fields as $field) {
-            if ('fieldsetStart' === $field->type && $field->isConditionalFormField) {
+            if ('fieldsetStart' === $field->type) {
                 $fieldsets[] = $field->id;
-                $this->conditions[$field->id] = $this->createCondition($field->conditionalFormFieldCondition);
+
+                if ($field->isConditionalFormField) {
+                    $conditions[] = $field->id;
+                    $this->conditions[$field->id] = $this->createCondition($field->conditionalFormFieldCondition);
+                }
+
                 continue;
             }
 
             if ('fieldsetStop' === $field->type) {
-                array_pop($fieldsets);
+                // If the current condition is equal to the current entry of all fieldsets, close the "condition" fieldset
+                if (array_pop($fieldsets) === end($conditions)) {
+                    array_pop($conditions);
+                }
                 continue;
             }
 
-            $this->fields[(string) $field->id] = $fieldsets;
+            $this->fields[(string) $field->id] = $conditions;
 
             if (!empty($field->name)) {
                 $this->formData[$field->name] = $this->getInput($field->name);
