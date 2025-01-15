@@ -47,11 +47,11 @@ class FormListener
             return $fields;
         }
 
-        if (isset($this->handlers[$formId])) {
-            return $fields;
+        if (!isset($this->handlers[$formId])) {
+            $this->handlers[$formId] = new FormHandler($form, $fields, $this->formManagerFactory);
         }
 
-        $this->handlers[$formId] = new FormHandler($form, $fields, $this->formManagerFactory);
+        $this->handlers[$formId]->init($form);
 
         return $fields;
     }
