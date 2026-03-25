@@ -1,0 +1,4 @@
+<fieldset{% if this.class|default %} class="{{ this.class|default }}"{% endif %}{% if this.cff_condition|default %} data-cff-condition="{{ this.cff_condition|e('html_attr') }}"{% endif %}>
+    {% if this.label %}
+        <legend>{{ this.label|insert_tag_raw }}</legend>
+    {% endif %}

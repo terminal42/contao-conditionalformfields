@@ -75,30 +75,29 @@ class FormHandler
                 $this->formData[$field->name] = $this->getInput($field->name);
             }
         }
-
-        if (!empty($this->conditions)) {
-            $GLOBALS['TL_JAVASCRIPT'][] = 'bundles/terminal42conditionalformfields/conditionalformfields.js';
-        }
     }
 
     public function init(Form $form): void
     {
+        if (empty($this->conditions)) {
+            return;
+        }
+
         // Add CSS class for current form
         $formAttributes = StringUtil::deserialize($form->attributes, true);
         $formAttributes[1] = trim(($formAttributes[1] ?? '').' cff');
+        $form->attributes = $formAttributes;
 
         if (!empty($previousData = $this->getPreviousDataFromMpForms())) {
-            $formAttributes[1] .= '" data-cff-previous="'.StringUtil::specialcharsAttribute(json_encode($previousData, JSON_THROW_ON_ERROR));
+            $form->Template->cff_previous = $previousData;
         }
-
-        $form->attributes = $formAttributes;
     }
 
     public function prepareField(Widget $widget): void
     {
         // Add a CSS class to conditional fieldset, so we can find and trigger them through JS
         if ($widget instanceof FormFieldsetStart && $widget->isConditionalFormField) {
-            $widget->class = '" data-cff-condition="'.StringUtil::specialcharsAttribute($widget->conditionalFormFieldCondition);
+            $widget->cff_condition = $widget->conditionalFormFieldCondition;
         }
     }
 

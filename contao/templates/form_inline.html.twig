@@ -1,0 +1,8 @@
+{% extends '@Contao/form_inline.html.twig' %}
+
+{% if cff_previous|default %}
+    {% set attributes = attrs()
+        .set('data-cff-previous', cff_previous|json_encode)
+        .mergeWith(attributes|default)
+    %}
+{% endif %}
