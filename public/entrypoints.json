@@ -1,0 +1,9 @@
+{
+  "entrypoints": {
+    "conditionalformfields": {
+      "js": [
+        "/bundles/terminal42conditionalformfields/conditionalformfields.50cf7fc3.js"
+      ]
+    }
+  }
+}

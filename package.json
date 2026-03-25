@@ -1,0 +1,19 @@
+{
+    "name": "@terminal42/contao-conditionalformfields",
+    "description": "conditionalformfields extension for Contao Open Source CMS",
+    "author": "terminal42 gmbh <info@terminal42.ch>",
+    "license": "MIT",
+    "scripts": {
+        "dev-server": "encore dev-server --https",
+        "dev": "encore dev",
+        "watch": "encore dev --watch",
+        "build": "encore production --progress"
+    },
+    "dependencies": {
+        "expression-language": "^2.5.4"
+    },
+    "devDependencies": {
+        "@terminal42/contao-build-tools": "./vendor/terminal42/contao-build-tools/webpack"
+    },
+    "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
+}

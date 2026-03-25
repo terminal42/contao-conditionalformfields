@@ -9,6 +9,7 @@ use Contao\CoreBundle\ServiceAnnotation\Hook;
 use Contao\Form;
 use Contao\FormFieldModel;
 use Contao\Widget;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Terminal42\ConditionalformfieldsBundle\FormHandler;
 use Terminal42\MultipageFormsBundle\FormManagerFactoryInterface;
@@ -26,8 +27,12 @@ class FormListener
      */
     private array $handlers = [];
 
-    public function __construct(RequestStack $requestStack, ScopeMatcher $scopeMatcher, ?FormManagerFactoryInterface $formManagerFactory = null)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        ScopeMatcher $scopeMatcher,
+        ?FormManagerFactoryInterface $formManagerFactory = null,
+        private readonly Packages $packages,
+    ) {
         $this->requestStack = $requestStack;
         $this->scopeMatcher = $scopeMatcher;
         $this->formManagerFactory = $formManagerFactory;
@@ -49,6 +54,7 @@ class FormListener
 
         if (!isset($this->handlers[$formId])) {
             $this->handlers[$formId] = new FormHandler($form, $fields, $this->formManagerFactory);
+            $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('conditionalformfields.js', 'terminal42_conditionalformfields');
         }
 
         $this->handlers[$formId]->init($form);

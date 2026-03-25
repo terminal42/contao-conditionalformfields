@@ -1,7 +1,22 @@
+import { ExpressionLanguage } from 'expression-language';
+
 (function () {
     "use strict";
 
     const initialized = [];
+    const el = new ExpressionLanguage();
+
+    el.register(
+        'in_array',
+        (needle, haystack) => `!!Object.values(${haystack}).find(v => v == '${needle}')`,
+        (values, needle, haystack) => !!Object.values(haystack).find(v => v == needle),
+    );
+
+    el.register(
+        'str_contains',
+        (needle, haystack) => `String('${haystack}').includes('${needle}')`,
+        (values, needle, haystack) => String(haystack).includes(needle),
+    );
 
     function init (node) {
         node.querySelectorAll('fieldset[data-cff-condition]').forEach(function (el) {
@@ -25,23 +40,7 @@
     }
 
     function toggleFieldset (fieldset, condition, formData) {
-        let fnBody = '"use strict";\n\n';
-        fnBody += 'function in_array (needle, haystack) { return !!Object.values(haystack).find(v => v == needle) }\n';
-        fnBody += 'function str_contains (haystack, needle) { return String(haystack).includes(needle) }\n\n'
-
-        formData.forEach(function (value, key) {
-
-            if (/^(?!(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$)[$A-Z_a-z][$A-Z_a-z0-9]*$/.test(key)) {
-                fnBody += `const ${key} = values.get('${key}');\n`;
-            } else {
-                console.warn(`terminal42/contao-conditionalformfields: skipping "${key}", this name is not supported in JavaScript variables.`);
-            }
-        });
-
-        fnBody += `\nreturn ${condition};`;
-        let fn = new Function('values', fnBody);
-
-        if (fn.call(undefined, formData)) {
+        if (el.evaluate(condition, Object.fromEntries(formData.entries()))) {
             fieldset.disabled = false
             fieldset.style.display = '';
         } else {
