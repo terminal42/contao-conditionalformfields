@@ -16,11 +16,7 @@ use Terminal42\MultipageFormsBundle\FormManagerFactoryInterface;
 
 class FormHandler
 {
-    private Form $form;
-
-    private ?FormManagerFactoryInterface $formManagerFactory;
-
-    private ExpressionLanguage $expressionLanguage;
+    private readonly ExpressionLanguage $expressionLanguage;
 
     private array $conditions = [];
 
@@ -31,16 +27,16 @@ class FormHandler
     /**
      * @param array<FormFieldModel> $fields
      */
-    public function __construct(Form $form, array $fields, ?FormManagerFactoryInterface $formManagerFactory = null)
-    {
-        $this->form = $form;
-        $this->formManagerFactory = $formManagerFactory;
-
+    public function __construct(
+        private readonly Form $form,
+        array $fields,
+        private readonly FormManagerFactoryInterface|null $formManagerFactory = null,
+    ) {
         $this->expressionLanguage = new ExpressionLanguage();
         $this->expressionLanguage->addFunction(
             new ExpressionFunction(
                 'in_array',
-                static fn ($needle, $haystack) => sprintf('\in_array(%s, (array) %s, false))', $needle, $haystack),
+                static fn ($needle, $haystack) => \sprintf('\in_array(%s, (array) %s, false))', $needle, $haystack),
                 static fn ($arguments, $needle, $haystack) => \in_array($needle, (array) $haystack, false),
             ),
         );
@@ -77,19 +73,19 @@ class FormHandler
         }
     }
 
-    public function init(Form $form): void
+    public function init(): void
     {
         if (empty($this->conditions)) {
             return;
         }
 
         // Add CSS class for current form
-        $formAttributes = StringUtil::deserialize($form->attributes, true);
+        $formAttributes = StringUtil::deserialize($this->form->attributes, true);
         $formAttributes[1] = trim(($formAttributes[1] ?? '').' cff');
-        $form->attributes = $formAttributes;
+        $this->form->attributes = serialize($formAttributes);
 
         if (!empty($previousData = $this->getPreviousDataFromMpForms())) {
-            $form->Template->cff_previous = $previousData;
+            $this->form->Template->cff_previous = $previousData;
         }
     }
 
@@ -113,18 +109,15 @@ class FormHandler
             $reflection = new \ReflectionClass($widget);
 
             $errors = $reflection->getProperty('arrErrors');
-            $errors->setAccessible(true);
             $errors->setValue($widget, []);
 
             $class = $reflection->getProperty('strClass');
-            $class->setAccessible(true);
             $class->setValue($widget, preg_replace('{(^| )error( |$)}', '', (string) $widget->class));
 
             // Widget must not submit their input if they are hidden
             // We previously used "disabled = true" (see #18) but that will result in the
             // field being disabled on subsequent run, since v3 only toggles the fieldset.
             $submitInput = $reflection->getProperty('blnSubmitInput');
-            $submitInput->setAccessible(true);
             $submitInput->setValue($widget, false);
 
             $widget->value = null;
@@ -159,7 +152,7 @@ class FormHandler
     /**
      * @return \Closure|true
      */
-    private function createCondition(?string $condition)
+    private function createCondition(string|null $condition)
     {
         if (empty($condition)) {
             return true;
@@ -181,11 +174,7 @@ class FormHandler
 
         $previousStepsData = $this->getPreviousDataFromMpForms();
 
-        if (isset($previousStepsData[$fieldName])) {
-            return $previousStepsData[$fieldName];
-        }
-
-        return null;
+        return $previousStepsData[$fieldName] ?? null;
     }
 
     private function getPreviousDataFromMpForms(): array

@@ -10,20 +10,16 @@ use Doctrine\DBAL\Connection;
 
 class ConditionMigration extends AbstractMigration
 {
-    private Connection $connection;
-
-    public function __construct(Connection $connection)
+    public function __construct(private readonly Connection $connection)
     {
-        $this->connection = $connection;
     }
 
     public function shouldRun(): bool
     {
-        $schemaManager = $this->connection->getSchemaManager();
+        $schemaManager = $this->connection->createSchemaManager();
 
         if (
-            null === $schemaManager
-            || !$schemaManager->tablesExist('tl_form_field')
+            !$schemaManager->tablesExist(['tl_form_field'])
             || !\array_key_exists('conditionalformfieldcondition', $schemaManager->listTableColumns('tl_form_field'))
         ) {
             return false;
@@ -42,7 +38,7 @@ class ConditionMigration extends AbstractMigration
         );
 
         foreach ($fields as $field) {
-            $expression = preg_replace('{(^|[^\'"])\$([a-z0-9_]+)}i', '$1$2', $field['conditionalFormFieldCondition']);
+            $expression = preg_replace('{(^|[^\'"])\$([a-z0-9_]+)}i', '$1$2', (string) $field['conditionalFormFieldCondition']);
 
             $this->connection->update(
                 'tl_form_field',
@@ -51,6 +47,6 @@ class ConditionMigration extends AbstractMigration
             );
         }
 
-        return $this->createResult(true, sprintf('Updated %s form field conditions', \count($fields)));
+        return $this->createResult(true, \sprintf('Updated %s form field conditions', \count($fields)));
     }
 }

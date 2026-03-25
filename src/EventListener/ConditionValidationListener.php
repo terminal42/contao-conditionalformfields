@@ -4,26 +4,20 @@ declare(strict_types=1);
 
 namespace Terminal42\ConditionalformfieldsBundle\EventListener;
 
-use Contao\CoreBundle\ServiceAnnotation\Callback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\DataContainer;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\ExpressionLanguage\Lexer;
 use Symfony\Component\ExpressionLanguage\Token;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * @Callback(table="tl_form_field", target="fields.conditionalFormFieldCondition.save")
- */
+#[AsCallback('tl_form_field', 'fields.conditionalFormFieldCondition.save')]
 class ConditionValidationListener
 {
-    private Connection $connection;
-
-    private TranslatorInterface $translator;
-
-    public function __construct(Connection $connection, TranslatorInterface $translator)
-    {
-        $this->connection = $connection;
-        $this->translator = $translator;
+    public function __construct(
+        private readonly Connection $connection,
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     public function __invoke(string $expression, DataContainer $dc): string
@@ -98,7 +92,7 @@ class ConditionValidationListener
         }
 
         foreach ($variables as $variable => $position) {
-            if (!preg_match('/^(?!(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$)[$A-Z_a-z][$A-Z_a-z0-9]*$/', $variable)) {
+            if (!preg_match('/^(?!(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$)[$A-Z_a-z][$A-Z_a-z0-9]*$/', (string) $variable)) {
                 $this->error('variable', $variable, $position);
             }
         }

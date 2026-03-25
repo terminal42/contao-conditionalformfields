@@ -1,0 +1,8 @@
+parameters:
+    ignoreErrors:
+        - '#no value type specified in iterable type#'
+        - '#Contao\\Form::\$Template#'
+        - '#FormFieldsetStart::\$isConditionalFormField#'
+        - '#FormFieldsetStart::\$cff_condition#'
+        - '#FormFieldsetStart::\$conditionalFormFieldCondition#'
+        - '#class MPFormsSessionManager#'
