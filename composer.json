@@ -1,12 +1,12 @@
 {
-    "name":"terminal42/contao-conditionalformfields",
-    "description":"conditionalformfields extension for Contao Open Source CMS; Display form fields based on conditionis!",
-    "keywords":["contao", "form", "conditions", "fields"],
-    "type":"contao-bundle",
-    "license":"MIT",
-    "authors":[
+    "name": "terminal42/contao-conditionalformfields",
+    "description": "conditionalformfields extension for Contao Open Source CMS; Display form fields based on conditionis!",
+    "keywords": ["contao", "form", "conditions", "fields"],
+    "type": "contao-bundle",
+    "license": "MIT",
+    "authors": [
         {
-            "name":"terminal42 gmbh",
+            "name": "terminal42 gmbh",
             "homepage": "https://www.terminal42.ch"
         }
     ],
@@ -25,10 +25,9 @@
         "source": "https://github.com/terminal42/contao-conditionalformfields"
     },
     "require": {
-        "php": "^7.4 || ^8.0",
-        "ext-json": "*",
-        "contao/core-bundle": "^4.13 || ^5.0",
-        "doctrine/dbal": "^2.11 || ^3"
+        "php": "^8.1",
+        "contao/core-bundle": "^5.3",
+        "doctrine/dbal": "^3.6 || ^4.3"
     },
     "require-dev": {
         "contao/manager-plugin": "^2.0",
@@ -37,7 +36,7 @@
     },
     "conflict": {
         "contao/manager-plugin": "<2.0 || >=3.0",
-        "terminal42/contao-mp_forms": "<4.4"
+        "terminal42/contao-mp_forms": "<4.4 || >= 6.0"
     },
     "autoload": {
         "psr-4": {
@@ -46,5 +45,13 @@
     },
     "extra": {
         "contao-manager-plugin": "Terminal42\\ConditionalformfieldsBundle\\ContaoManager\\Plugin"
+    },
+    "config": {
+        "allow-plugins": {
+            "contao-components/installer": false,
+            "php-http/discovery": false,
+            "contao/manager-plugin": false,
+            "terminal42/contao-build-tools": true
+        }
     }
 }

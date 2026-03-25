@@ -3,7 +3,7 @@
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
 PaletteManipulator::create()
-    ->addField('isConditionalFormField', 'expert_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField('isConditionalFormField', 'fconfig_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('fieldsetStart', 'tl_form_field')
 ;
 
