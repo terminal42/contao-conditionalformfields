@@ -25,5 +25,17 @@ foo == '1'
 ```
 
 ### Note for Version 3
+
 The field names had a prefix `$` until version 3 - this is no longer necessary.
-When updating to version 3, the conditions are automatically adjusted.
+When updating to version 3 or later, the conditions are automatically adjusted.
+
+## Support for member fields
+
+Version 4 adds support for conditions on member fields, e.g. for the member registration.
+To use conditions, you have to follow a strict setup:
+1. create new DCA fields for `tl_member` with `inputType` of `fieldsetStart` and `fieldsetStop` as necessary
+2. set `eval => isConditionalFormField = true` and `eval => conditionalFormFieldCondition = 'your-condition'` on the `fieldsetStart`
+3. make sure to also set `feEditable` and `feGroup` accordingly
+4. select the new fields in the member registration module and **sort them so the appropriate fields are within the start and stop field**.
+
+_Known limitation: mandatory fields will not show as mandatory (asterisk) after a form submit, if they were hidden during the form submit._

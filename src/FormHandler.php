@@ -16,8 +16,6 @@ use Terminal42\MultipageFormsBundle\FormManagerFactoryInterface;
 
 class FormHandler
 {
-    private readonly ExpressionLanguage $expressionLanguage;
-
     private array $conditions = [];
 
     private array $fields = [];
@@ -30,18 +28,9 @@ class FormHandler
     public function __construct(
         private readonly Form $form,
         array $fields,
+        private readonly ExpressionLanguage $expressionLanguage,
         private readonly FormManagerFactoryInterface|null $formManagerFactory = null,
     ) {
-        $this->expressionLanguage = new ExpressionLanguage();
-        $this->expressionLanguage->addFunction(
-            new ExpressionFunction(
-                'in_array',
-                static fn ($needle, $haystack) => \sprintf('\in_array(%s, (array) %s, false))', $needle, $haystack),
-                static fn ($arguments, $needle, $haystack) => \in_array($needle, (array) $haystack, false),
-            ),
-        );
-        $this->expressionLanguage->addFunction(ExpressionFunction::fromPhp('str_contains'));
-
         $conditions = [];
         $fieldsets = [];
 

@@ -11,6 +11,7 @@ use Contao\FormFieldModel;
 use Contao\Widget;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Terminal42\ConditionalformfieldsBundle\ExpressionLanguageFactory;
 use Terminal42\ConditionalformfieldsBundle\FormHandler;
 use Terminal42\MultipageFormsBundle\FormManagerFactoryInterface;
 
@@ -26,6 +27,7 @@ class FormListener
         private readonly ScopeMatcher $scopeMatcher,
         private readonly FormManagerFactoryInterface|null $formManagerFactory,
         private readonly Packages $packages,
+        private readonly ExpressionLanguageFactory $expressionLanguageFactory,
     ) {
     }
 
@@ -42,11 +44,11 @@ class FormListener
         }
 
         if (!isset($this->handlers[$formId])) {
-            $this->handlers[$formId] = new FormHandler($form, $fields, $this->formManagerFactory);
-            $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('conditionalformfields.js', 'terminal42_conditionalformfields');
+            $this->handlers[$formId] = new FormHandler($form, $fields, $this->expressionLanguageFactory->create(), $this->formManagerFactory);
         }
 
         $this->handlers[$formId]->init();
+        $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('conditionalformfields.js', 'terminal42_conditionalformfields');
 
         return $fields;
     }
