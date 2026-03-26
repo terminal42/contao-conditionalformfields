@@ -179,27 +179,16 @@ class FormHandler
 
     private function getPreviousDataFromMpForms(): array
     {
-        // MP Forms v5
-        if (null !== $this->formManagerFactory) {
-            $manager = $this->formManagerFactory->forFormId((int) $this->form->id);
-
-            if ($manager->isPreparing()) {
-                return [];
-            }
-
-            $previousStepsData = $manager->getDataOfAllSteps();
-
-            return $previousStepsData->getAllSubmitted();
+        if (null === $this->formManagerFactory) {
+            return [];
         }
 
-        // MP Forms v4
-        if (class_exists(\MPFormsSessionManager::class)) {
-            $manager = new \MPFormsSessionManager($this->form->id);
-            $previousStepsData = $manager->getDataOfAllSteps();
+        $manager = $this->formManagerFactory->forFormId((int) $this->form->id);
 
-            return $previousStepsData['submitted'];
+        if ($manager->isPreparing()) {
+            return [];
         }
 
-        return [];
+        return $manager->getDataOfAllSteps()->getAllSubmitted();
     }
 }
