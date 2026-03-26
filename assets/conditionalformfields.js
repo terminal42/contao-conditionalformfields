@@ -1,4 +1,5 @@
 import { ExpressionLanguage } from 'expression-language';
+import './images/condition.svg'; // load with Webpack for backend use
 
 (function () {
     const initialized = [];
