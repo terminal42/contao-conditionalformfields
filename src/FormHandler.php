@@ -89,14 +89,6 @@ class FormHandler
         }
     }
 
-    public function prepareField(Widget $widget): void
-    {
-        // Add a CSS class to conditional fieldset, so we can find and trigger them through JS
-        if ($widget instanceof FormFieldsetStart && $widget->isConditionalFormField) {
-            $widget->cff_condition = $widget->conditionalFormFieldCondition;
-        }
-    }
-
     public function validateField(Widget $widget): void
     {
         // At this stage, widgets are already validated by the Form class

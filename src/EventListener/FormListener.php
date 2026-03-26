@@ -51,16 +51,6 @@ class FormListener
         return $fields;
     }
 
-    #[AsHook('loadFormField')]
-    public function onLoadFormField(Widget $widget, string $formId): Widget
-    {
-        if (isset($this->handlers[$formId])) {
-            $this->handlers[$formId]->prepareField($widget);
-        }
-
-        return $widget;
-    }
-
     #[AsHook('validateFormField')]
     public function onValidateFormField(Widget $widget, string $formId): Widget
     {
