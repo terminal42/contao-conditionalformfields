@@ -6,11 +6,9 @@ namespace Terminal42\ConditionalformfieldsBundle;
 
 use Contao\Form;
 use Contao\FormFieldModel;
-use Contao\FormFieldsetStart;
 use Contao\Input;
 use Contao\StringUtil;
 use Contao\Widget;
-use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Terminal42\MultipageFormsBundle\FormManagerFactoryInterface;
 

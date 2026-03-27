@@ -40,11 +40,10 @@ class MemberListener
             return;
         }
 
-        $this->fields = [];
         $this->fieldsets = [];
         $this->conditions = [];
 
-        foreach ($GLOBALS['TL_DCA']['tl_member']['fields'] as $field => &$config) {
+        foreach ($GLOBALS['TL_DCA']['tl_member']['fields'] as &$config) {
             if ($config['eval']['feEditable'] ?? false) {
                 $config['attributes_callback'][] = [self::class, 'getAttributesFromDca'];
             }
