@@ -43,6 +43,11 @@ class FormListener
             return $fields;
         }
 
+        if (empty($form->Template)) {
+            // The form template is not loaded yet
+            return $fields;
+        }
+
         if (!isset($this->handlers[$formId])) {
             $this->handlers[$formId] = new FormHandler($form, $fields, $this->expressionLanguageFactory->create(), $this->formManagerFactory);
         }
