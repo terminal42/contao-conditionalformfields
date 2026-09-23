@@ -59,7 +59,7 @@ import './images/condition.svg'; // load with Webpack for backend use
             });
         }
 
-        formData.entries().forEach(([name, value]) => {
+        Array.from(formData.entries()).forEach(([name, value]) => {
             // Array
             if (name.substring(name.length - 2) === '[]') {
                 const key = name.substring(0, name.length - 2);
