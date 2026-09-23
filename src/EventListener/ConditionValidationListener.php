@@ -72,9 +72,7 @@ class ConditionValidationListener
                 continue;
             }
 
-            if (!isset($variables[$value])) {
-                $variables[$value] = $tokens[$i]->cursor;
-            }
+            $variables[$value] ??= $tokens[$i]->cursor;
         }
 
         if (!$dc->activeRecord->pid) {

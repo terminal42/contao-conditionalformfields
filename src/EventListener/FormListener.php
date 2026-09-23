@@ -7,7 +7,6 @@ namespace Terminal42\ConditionalformfieldsBundle\EventListener;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Form;
-use Contao\FormFieldModel;
 use Contao\Widget;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -39,13 +38,11 @@ class FormListener
             return $fields;
         }
 
-        if (!$this->hasConditions($fields)) {
+        if (!array_any($fields, static fn ($field) => 'fieldsetStart' === $field->type && $field->isConditionalFormField)) {
             return $fields;
         }
 
-        if (!isset($this->handlers[$formId])) {
-            $this->handlers[$formId] = new FormHandler($form, $fields, $this->expressionLanguageFactory->create(), $this->formManagerFactory);
-        }
+        $this->handlers[$formId] ??= new FormHandler($form, $fields, $this->expressionLanguageFactory->create(), $this->formManagerFactory);
 
         $this->handlers[$formId]->init();
         $GLOBALS['TL_JAVASCRIPT'][] = $this->packages->getUrl('conditionalformfields.js', 'terminal42_conditionalformfields');
@@ -61,19 +58,5 @@ class FormListener
         }
 
         return $widget;
-    }
-
-    /**
-     * @param array<FormFieldModel> $fields
-     */
-    private function hasConditions(array $fields): bool
-    {
-        foreach ($fields as $field) {
-            if ('fieldsetStart' === $field->type && $field->isConditionalFormField) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
